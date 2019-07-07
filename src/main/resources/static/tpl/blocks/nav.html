@@ -1,0 +1,60 @@
+     <div class="user-panel"  >
+    	<div class="f-left image">
+    		<img src="img/user_universitario.png" alt="User Image" class="img-circle imgodonto">
+    	</div>
+        <div  class="f-right userdonto" ng-controller="asideController">
+        	<h6 class="title">Usuario: </h6> 
+        	<div class="contenedoruser">
+        		<p class="nombreuser">{{nombreusuario1}} </p>
+        	 	<p ng-show="nombreusuario2!=''" class="nombreuser">{{nombreusuario2}}</p>
+      	   	</div>  
+      	   <!--  	<h6 class="title">Perfil: </h6> 
+        	<div class="contenedoruser">
+        		<p class="nombreuser">{{user.userperfiles.perfiles.descripcion}}</p>
+           	</div>  
+           	-->
+	   	</div>
+    </div>
+ <!-- list -->
+<ul class="nav" ng-init="retornaAccesos()"  >
+ <li ui-sref-active="active">
+    <a ui-sref="app.ui.inicio">
+		<i class="fa  fa-home"></i> 
+     <span class="font-bold" translate="">Inicioo </span>
+    </a>
+  </li>
+
+    <li ui-sref-active="active">
+    <a ui-sref="app.ui.actualizardatos">
+		<i class="fa fa-id-card-o"></i> 
+     <span class="font-bold" translate="">Actualizar Datos </span>
+    </a>
+  </li>
+ <li ui-sref-active="active">
+    <a ui-sref="app.ui.infoacademica">
+<i class="fa fa-graduation-cap"></i>
+      <span class="font-bold" translate="">Informacion Academica</span>
+    </a>
+  </li>
+   <li ui-sref-active="active">
+    <a ui-sref="app.ui.experiencialaboral">
+      <i class="fa fa-briefcase"></i>
+      <span class="font-bold" translate="">Experiencia Laboral</span>
+    </a>
+  </li>
+    <li ui-sref-active="active">
+    <a ui-sref="app.ui.valoracionservicios">
+      <i class="fa fa-pencil-square-o"></i>
+      <span class="font-bold" translate="">Valoracion </span>
+    </a>
+  </li>
+  
+     <li ui-sref-active="active">
+        <a ui-sref="app.logout">
+            <i class="fa fa-sign-out"></i>
+            <span class="font-bold" >Salir</span>
+        </a>
+    </li>
+</ul>
+
+<!-- / list -->

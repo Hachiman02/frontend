@@ -1,0 +1,101 @@
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<script type="text/ng-template" id="modalMarcaController.html">
+    <div ng-include="'tpl/marca/modalMarca.html'"></div>
+</script>
+<script type="text/ng-template" id="modalnuevoMarca.html">
+    <div ng-include="'tpl/marca/nuevoMarca.html'"></div>
+</script>
+<div
+	cg-busy="{promise:promise,templateUrl:template,message:message,backdrop:backdrop,delay:delay,minDuration:minDuration}">
+	<div class="bg-light lter b-b wrapper-md ng-scope">
+		<h1 class="m-n font-thin h3">Experiencia Laboral</h1>
+
+	</div>
+	<div ui-view class="panel panel-default">
+		<div class="row wrapper">
+			 
+			 <!--The content below is only a placeholder and can be replaced.-->
+    <h2 class="col-sm-10" style="left:25px">EJERCICIO PROFESIONAL O DOCENTE</h2>
+    <p class="col-sm-10" style="left:25px">Consigne el desempeño profesional o desempeño docente: Entidad en la que labora, Cargo que desempeña, Tiempo(años,meses) del servicio.[El mas reciente]</p>
+    <div class="form-group">
+    <div class="form-group">
+        <label class="col-sm-10" style="left:25px">ENTIDAD</label>
+        <div class="col-sm-10" style="left:25px">
+        <input name="subject" placeholder="Tu respuesta" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Tu respuesta'" class="common-input mb-20 form-control" required="" type="text" 	align="right"></br>
+</div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-10" style="left:25px">TIPO DE ENTIDAD</label>
+        <div class="col-sm-10" style="left:25px">
+        <input type="radio" name="entidad" value="p1">Publica<br>
+        <input type="radio" name="entidad" value="p2">Privada<br>
+        <input type="radio" name="entidad" value="OTRO"> Otro: 
+        <input name="subject" placeholder="Especifica la entidad" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Tu respuesta'" class="common-input mb-20 form-control" required="" type="text" 	align="right"><br>
+    </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-10" style="left:25px">CARGO</label>
+        <div class="col-sm-10" style="left:25px">
+        <input name="subject" placeholder="Tu respuesta" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Tu respuesta'" class="common-input mb-20 form-control" required="" type="text" 	align="right"><br>
+    </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-10" style="left:25px">PRINCIPALES FUNCIONES QUE DESEMPEÑA</label>
+        <div class="col-sm-10" style="left:25px"> 
+        <small id="funcioneshelp" class="form-text text-muted">Comente las principales funciones que desempeña</small><br>
+        <input name="subject" placeholder="Tu respuesta" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Tu respuesta'" class="common-input mb-20 form-control" required="" type="text" 	align="right"><br>
+    </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-10" style="left:25px">TIPO DE VINCULO LABORAL</label>
+        <div class="col-sm-10" style="left:25px">
+        <input type="radio" name="vinculo" value="p1">Dependiente<br>
+        <input type="radio" name="vinculo" value="p2">Independiente<br>
+        <input type="radio" name="vinculo" value="p1">CAS<br>
+        <input type="radio" name="vinculo" value="p2">Por servicio<br>
+        <input type="radio" name="vinculo" value="OTRO"> Otro:<br>
+        <input name="subject" placeholder="Tu respuesta" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Tu respuesta'" class="common-input mb-20 form-control" required="" type="text" 	align="right"><br>
+    </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-10" style="left:25px">N° DE AÑOS</label>
+        <div class="col-sm-10" style="left:25px">
+        <small id="funcioneshelp" class="form-text text-muted">Indique el N° de años que se desempeña em la Entidad</small><br>
+        <input name="subject" placeholder="Tu respuesta" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Tu respuesta'" class="common-input mb-20 form-control" required="" type="text" 	align="right"><br>
+</div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-10" style="left:25px">N° DE MESES</label>
+        <div class="col-sm-10" style="left:25px">
+        <small id="funcioneshelp" class="form-text text-muted">Indique el N° de meses que se desempeña em la Entidad</small><br>
+        <input name="subject" placeholder="Tu respuesta" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Tu respuesta'" class="common-input mb-20 form-control" required="" type="text" 	align="right"><br>
+    </div>
+    </div>
+    <div class="form-group">
+            <label class="col-sm-10" style="left:25px">NOMBRE DE SU JEFE INMEDIATO SUPERIOR</label>
+            <div class="col-sm-10" style="left:25px">
+            <input name="subject" placeholder="Tu respuesta" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Tu respuesta'" class="common-input mb-20 form-control" required="" type="text" 	align="right"><br>
+            </div>
+        </div>
+        <div class="form-group">
+               <label class="col-sm-10" style="left:25px">CORREO ELECTRONICO DE SU JEFE INMEDIATO SUPERIOR</label>
+			<div class="col-sm-10" style="left:25px">
+            <input name="subject" placeholder="Tu respuesta" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Tu respuesta'" class="common-input mb-20 form-control" required="" type="text" 	align="right"><br>
+            </div>
+            </div>
+          
+            <div class="form-group">
+            <div class="col-sm-10" style="left:25px">
+            <form action="http://app.admision.unmsm.edu.pe/app/docentes/form1.php" method="post" target="_blank">
+              <input name="boton" style="width: 150px; height: 30px;" type="submit" value="SIGUIENTE" />
+              </form>
+            </div>
+            </div>
+            
+            <br>
+            
+</div>
+			 
+			</div>
+		</div>
+	</div>

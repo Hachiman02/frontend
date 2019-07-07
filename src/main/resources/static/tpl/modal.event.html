@@ -1,0 +1,198 @@
+  <meta charset="utf-8" />
+<script type="text/ng-template" id="modalPacienteController.html">
+    <div ng-include="'tpl/paciente/new.html'"></div>
+</script>
+<div class="modal-header ">
+	<span class="pull-left">{{idval>0?'Actualizar':'Registro de
+		nueva'}} cita {{idval>0?''+idval:''}}</span>
+	<div class="pull-right" ng-hide="idval>0?false:true">
+
+		<div class="btn-group m-l-xs"  >
+			<a class="btn btn-sm btn-default"
+				ng-click=" traslada(cita.idpaciente)">Paciente</a>
+			<!--<button class="btn btn-sm btn-default"
+				ng-click="">Presupuesto</button>   -->
+			<!--<button class="btn btn-sm btn-default" ng-click="">Pagos</button>-->
+		</div>
+	</div>
+</div>
+<form name="formValidate"
+	class="form-horizontal form-validation ng-pristine ng-valid">
+	<div class="panel-body">
+		<div class="form-group" ng-hide="verbarra!=true?true:false">
+			<label class="col-sm-2 control-label text-danger">Paciente</label>
+			<div class="col-sm-10">
+				<div class="input-group m-b">
+					<div class="input-group-btn dropdown" dropdown>
+						<button type="button" class="btn btn-default" tabindex="-1">{{filtro.etiqueta}}</button>
+						<button type="button" class="btn btn-default" dropdown-toggle>
+							<span class="caret"></span>
+						</button>
+						<ul class="dropdown-menu">
+							<li ng-repeat="a in filtrosclientes" ng-click="seteaobj(a)"><a
+								href>{{a.nombre}}</a></li>
+							<li class="divider"></li>
+							<li ng-click="blanqueado()"><a>Nuevo paciente</a></li>
+						</ul>
+					</div>
+					<ui-select ng-model="filtros.paciente" theme="bootstrap" ng-change="seteaPaciente();bloqueo=true" ng-hide="$scope.opcion.id==2?true:false"
+							style="min-width: 300px;"  > 
+						<ui-select-match
+							placeholder="Seleccione un paciente de la lista">
+							{{$select.selected.nombre +" "+ $select.selected.apepat+" "+ $select.selected.apemat}}
+						</ui-select-match>
+						<ui-select-choices
+							repeat="person in lsclientes | propsFilter: {nombre: $select.search,apepat: $select.search,apemat: $select.search}">
+							<small>
+					 			<span ng-bind-html="person.nombre+' '+person.apepat+' '+person.apemat | highlight: $select.search"></span>
+							</small> 
+						</ui-select-choices> 
+					</ui-select>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label text-danger">DNI:</label>
+			<div class="col-sm-5">
+				<input type="text" ng-disabled="bloqueo==undefined?true:bloqueo" class="form-control" maxlength="8"
+					placeholder="Ingrese DNI" ng-change="validardni(cita.documentoidentidad)"
+					ng-model="cita.documentoidentidad"  >
+			</div>
+			<label ng-hide="idval>0?false:true"
+				class="col-sm-2 control-label text-danger">Estado:</label>
+			<div ng-hide="idval>0?false:true" class="col-sm-3">
+				<select class="form-control" ng-disabled="citavencia==1?true:false"
+					ng-model="cita.estado" ng-change="eliminarcita()"
+					ng-options="value.idestadoevento as value.descripcion for value in estadocita">
+					<option>--</option>
+				</select>
+			</div>
+
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label text-danger">Nombres:</label>
+			<div class="col-sm-5">
+				<input type="text" ng-disabled="bloqueo==undefined?true:bloqueo" class="form-control"
+					placeholder="Ingrese nombres del paciente" ng-change="validarnombre(cita.nomprepaciente)"
+					ng-model="cita.nomprepaciente"  >
+			</div>
+			<label class="col-sm-2 control-label text-danger">Telefono:</label>
+			<div class="col-sm-3">
+				<input type="text" ng-disabled="bloqueo==undefined?true:bloqueo" class="form-control"
+					placeholder="Ingrese telefono" ng-change="validartlf(cita.telefono)" 
+					ng-model="cita.telefono" maxlength="9">
+			</div>
+		</div>
+			<div class="form-group">
+			<label class="col-sm-2 control-label text-danger">Apellido Paterno:</label>
+			<div class="col-sm-5">
+				<input type="text" ng-disabled="bloqueo==undefined?true:bloqueo" class="form-control"
+					placeholder="Ingrese apellido paterno" ng-change="validarapepat(cita.apepat)"
+					ng-model="cita.apepat"  >
+			</div>
+			<label class="col-sm-2 control-label text-danger">Apellido Materno:</label>
+			<div class="col-sm-3">
+				<input type="text" ng-disabled="bloqueo==undefined?true:bloqueo" class="form-control"
+					placeholder="Ingrese apellido materno"  ng-change="validarapemat(cita.apemat)"
+					ng-model="cita.apemat" maxlength="9">
+			</div>
+		</div>
+	 	<div class="form-group">
+			<label class="col-md-2 control-label text-danger"> Doctor: </label>
+			<div class="col-md-4">
+				<select class="form-control" ng-model="cita.iddoctor" ng-disabled="cita.iddoctor>0?true:false"
+					ng-options="value.iddoctor as value.nombres for value in empleados">
+					<option>--</option>
+				</select> <span
+					ng-show="myForm.idocupacion.$dirty && myForm.idocupacion.$invalid"
+					class="help-inline">idocupacion requerido!</span>
+			</div>
+			<label class="col-md-2 control-label text-danger"> Servicio:
+			</label>
+			<div class="col-md-4">
+				<select class="form-control" ng-model="cita.idservicio" required
+					ng-change="retornaSelServicio(cita.idservicio)"
+					ng-options="value.idservicio as value.nombre for value in servicios">
+					<option>--</option>
+				</select> <span
+					ng-show="myForm.idocupacion.$dirty && myForm.idocupacion.$invalid"
+					class="help-inline">servicio requerido!</span>
+			</div>
+		</div>
+
+
+		<div class="form-group">
+			<label class="col-md-2 control-label text-danger"> Día: </label>
+			<div class="col-sm-2">
+				<select class="form-control " ng-model="cita.dia" required
+					ng-options="value.id as value.name for value in diasmes">
+
+				</select>
+			</div>
+			<div class="col-sm-2">
+				<select class="form-control " ng-model="cita.mes" required
+					ng-options="value.numero as value.nombre for value in mes">
+				</select>
+			</div>
+			<div class="col-sm-2">
+				<select class="form-control " ng-model="cita.anio" required
+					ng-options="value.id as value.name for value in anios">
+				</select>
+			</div>
+
+		</div>
+		<div class="form-group">
+			<label class="col-md-2 control-label text-danger"> Hora: </label>
+			<div class="col-sm-2">
+				<select class="form-control " ng-model="cita.hora" required
+					ng-options="value.id as value.name for value in horas">
+
+				</select>
+			</div>
+			<div class="col-sm-2">
+				<select class="form-control " ng-model="cita.minuto"
+					ng-options="value.id as value.id for value in minutos" required>
+				</select>
+			</div>
+			<label class="col-md-2 control-label text-danger"> Duracion:
+			</label>
+			<div class="col-sm-4">
+				<input type="text" ng-disabled="true" class="form-control"
+					placeholder="Ingrese duración" ng-model="cita.duracion" required>
+			</div>
+
+		</div>
+		<div class="form-group" ng-show=adver>
+           <div class="col-sm-12" style="background:">
+              	<div class="alert alert-warning" style="font-size:15px">
+                	<i class="glyphicon glyphicon-info-sign"></i>&nbsp&nbsp
+                    	{{msg}}
+             	</div>
+        	</div> 
+        </div>
+		<div class="form-group">
+			<label class="col-md-2  text-danger"> Comentario: </label>
+			<div class="col-md-10">
+				<textarea class="form-control " ng-model="cita.comentarios">
+                </textarea>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal-footer">
+		<button type="button" tooltip-placement="left"
+			tooltip="Click para regresar a la lista"
+			class="btn btn-sm btn-default btn-addon" ng-click="regresar()">
+			<i class="fa fa-check-square"></i>Regresar sin guardar
+		</button>
+		<button type="submit" class="btn btn-sm btn-success btn-addon"
+			ng-click="crud(1,cita)">
+			<i class="fa fa-save"></i>Agendar Cita
+		</button>
+<!--	ng-disabled="formValidate.$invalid||citavencia==1?true:false" -->
+
+	</div>
+</form>
+
+
+ 

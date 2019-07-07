@@ -1,0 +1,115 @@
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<script type="text/ng-template" id="modalMarcaController.html">
+    <div ng-include="'tpl/marca/modalMarca.html'"></div>
+</script>
+<script type="text/ng-template" id="modalnuevoMarca.html">
+    <div ng-include="'tpl/marca/nuevoMarca.html'"></div>
+</script>
+<div cg-busy="{promise:promise,templateUrl:template,message:message,backdrop:backdrop,delay:delay,minDuration:minDuration}">
+	<div class="bg-light lter b-b wrapper-md ng-scope">
+		<h1 class="m-n font-thin h3">FORMULARIO</h1>
+
+	</div>
+	<div ui-view class="panel panel-default">
+		<div class="row wrapper">
+			
+			
+				<div style="height: 800px">
+				<div class="modal-body" style="left:25px">
+	<form name="formValidate" class="form-horizontal form-validation">
+	<div class="form-group">
+			<label class="col-sm-12">DOCUMENTO DE IDENTIDAD (DNI O CARNE EXTRANJERIA)</label>
+			<div class="col-sm-10">
+				<input type="text" class="form-control"
+					placeholder="Ingrese documento de identidad" ng-model="user.dni" required>
+			</div>
+		</div>
+	
+		<div class="form-group">
+			<label class="col-sm-3">APELLIDO PATERNO</label>
+			<div class="col-sm-10">
+				<input type="text" class="form-control"
+					placeholder="Ingrese apellido paterno" ng-model="user.ape_paterno" required>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-3">APELLIDO MATERNO</label>
+			<div class="col-sm-10">
+				<input type="text" class="form-control"
+					placeholder="Ingrese apellido materno" ng-model="user.ape_materno"
+					required>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-3">NOMBRES</label>
+			<div class="col-sm-10">
+				<input type="text" class="form-control"
+					placeholder="Ingrese nombres" ng-model="user.nom_alumno"
+					required>
+			</div>
+		</div>
+		
+		
+	<div class="form-group">
+	<div class="col-sm-12" ng-controller="DatepickerDemoCtrl">
+			<label class="col-sm-3" style="padding: 0% 0%">FECHA DE NACIMIENTO (FECHA)</label>
+			<div class="input-group col-sm-10">
+					<input id="datepicker" type="text" class="form-control"
+						placeholder="Ingrese fecha" datepicker-popup="{{format}}"
+						is-open="opened" ng-disabled="true"
+						ng-model="user.nac_fecha" datepicker-options="dateOptions"
+						ng-required="true" close-text="Close" /> <span
+						class="input-group-addon" style="cursor: pointer"
+						ng-click="open($event)"> <i
+						class="calendar1 glyphicon glyphicon-calendar"></i>
+					</span>
+				</div>
+				</div>
+		</div>
+		
+		<div class="form-group">
+			<label class="col-sm-3">DOMICILIO ACTUAL</label>
+			<div class="col-sm-10">
+				<input type="text" class="form-control"
+					placeholder="Ingrese domicilio actual" ng-model="user.domicilio_actual"
+					required>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-3">NUMERO DE TELEFONO FIJO</label>
+			<div class="col-sm-10">
+				<input type="text" class="form-control"
+					placeholder="Ingrese munero de telefono" ng-model="user.telefono"
+					required>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-3">NUMERO DE CELULAR</label>
+			<div class="col-sm-10">
+				<input type="text" class="form-control"
+					placeholder="Ingrese numero celular" ng-model="user.telefono_movil"
+					required>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-3">CORREO ELECTRONICO PERSONAL</label>
+			<div class="col-sm-10">
+				<input type="text" class="form-control"
+					placeholder="Ingrese correo electronico personal" ng-model="user.correo_personal"
+					required>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-3">CORREO ELECTRONICO LABORAL</label>
+			<div class="col-sm-10">
+				<input type="text" class="form-control"
+					placeholder="Ingrese correo electronico laboral" ng-model=user.correo
+					required>
+			</div>
+		</div>
+		
+	</form>
+</div>
+			</div>
+		</div>
+	</div>

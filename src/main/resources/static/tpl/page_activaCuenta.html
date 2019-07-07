@@ -1,0 +1,26 @@
+<div class="col wrapper-md"
+	cg-busy="{promise:promise,templateUrl:template,message:message,backdrop:backdrop,delay:delay,minDuration:minDuration}">
+
+
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+
+
+
+	<meta charset="utf-8" />
+	<div class="container w-xl w-auto-xs"
+		ng-init="app.settings.container = false;">
+		<a href class="navbar-brand block m-t">{{app.name}}</a>
+		<div class="m-b-lg">
+			<div
+				style="background-image: url('img/Reload-1s-200px.gif'); background-position: 50% 20px; background-repeat: no-repeat">
+
+				<div
+					style="text-align: center; font-size: 26px; position: absolute; top: 100px; width: 100%; text-shadow: 1px 1px 2px white, -1px -1px 2px white, -4px 4px 4px white, -4px 4px 4px white">{{$message}}</div>
+
+			</div>
+
+		</div>
+		<div class="text-center" ng-include="'tpl/blocks/page_footer.html'">
+			{% include 'blocks/page_footer.html' %}</div>
+	</div>

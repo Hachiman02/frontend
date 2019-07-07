@@ -1,0 +1,52 @@
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<script type="text/ng-template" id="modalMarcaController.html">
+    <div ng-include="'tpl/marca/modalMarca.html'"></div>
+</script>
+<script type="text/ng-template" id="modalnuevoMarca.html">
+    <div ng-include="'tpl/marca/nuevoMarca.html'"></div>
+</script>
+
+ <link rel="stylesheet" href=app.css"/>
+
+ 
+
+
+<div cg-busy="{promise:promise,templateUrl:template,message:message,backdrop:backdrop,delay:delay,minDuration:minDuration}">
+	<div class="bg-light lter b-b wrapper-md ng-scope">
+		<h1 class="m-n font-thin h3">Formacion Academica</h1>
+
+	</div>
+	<div ui-view class="panel panel-default">
+		<div class="row wrapper">
+		 
+ 	<div class="col-sm-10" style="left:25px">
+	<div class="filtro">
+		<span class="buscarPerfiles">Buscar Perfiles:</span> 
+		<input ng-model="perfilBuscado" class="filtroPerfil">
+	</div> 
+</div>
+<div class="col-sm-10" style="left:25px">
+	 <table class="tablaPerfil">
+	 	<tr>
+	 		<th>Nombre Perfil</th>
+	 		<th>Descripcion</th>
+	 	</tr>
+		<tr ng-repeat="perfil in perfiles | filter:perfilBuscado">
+			<td>{{perfil.perfil}}</td>
+			<td>{{perfil.descripcion}}</td>
+		</tr>
+	</table>
+	
+	</div>
+<div class="col-sm-10" style="left:25px">
+	<div class="otro">
+		<span class="otros">Agregar Otro Perfil:</span> 
+		<br>
+		<br>
+		Ingrese otro perfil: <input type="text" name="usrname"><br>
+		<br>
+  		<input type="submit" value="Agregar Perfil">
+	</div> 
+   	</div>
+	</div>
+	</div>

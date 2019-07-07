@@ -1,0 +1,97 @@
+<meta charset="utf-8" />
+<div class="col wrapper-md"
+	cg-busy="{promise:promise,templateUrl:template,message:message,backdrop:backdrop,delay:delay,minDuration:minDuration}">
+
+<div class="modal-header ">
+	<h3 class="modal-title">Prueba Gratis</h3>
+
+</div>
+<form name="formValidate"
+	class="form-horizontal form-validation ng-pristine ng-valid">
+	<div class="panel-body">
+
+
+		<div class="form-group">
+			<label class="col-sm-3 control-label">Ruc Clinica:</label>
+			<div class="col-sm-4">
+				<input type="text" class="form-control" maxlength="11"
+					placeholder="Ingrese ruc de la clinica"
+					ng-blur="retonaPorRuc(users.clinica.ruc)"
+					ng-model="users.clinica.ruc" required>
+			</div>
+
+			<label class="col-md-2 control-label"> Departamento: </label>
+			<div class="col-md-3">
+				<select class="form-control" ng-model="users.clinica.departamento"
+					ng-options="value.departamento as value.departamento  for value in ubigeos">
+					<option>--</option>
+				</select>
+
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label class="col-sm-3 control-label">Nombre Comercial:</label>
+			<div class="col-sm-9">
+				<input type="text" class="form-control" placeholder="Ingrese name"
+					ng-model="users.clinica.nombrecomercial" required>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label class="col-sm-3 control-label">Nombre Contacto:</label>
+			<div class="col-sm-9">
+				<input type="text" class="form-control"
+					placeholder="Ingrese nombre contacto" ng-model="users.name"
+					required>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-3 control-label">Telefono:</label>
+			<div class="col-sm-9">
+				<input type="text" class="form-control" placeholder="Ingrese name"
+					ng-model="users.clinica.telefono" required>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label class="col-sm-3 control-label">Email:</label>
+			<div class="col-sm-9 ">
+				<input type="email" ng-blur="retonaPorEmail(users.email)"
+					class="form-control" placeholder="Ingrese email"
+					ng-model="users.email" required> <span
+					class="input-group-btn"> <a href="" class="active"
+					ui-toggle-class=""><i
+						class="fa fa-check text-success text-active"></i><i
+						class="fa fa-times text-danger text"></i></a>
+				</span>
+			</div>
+		</div>
+
+		<div class="form-group" ng-hide="users.id==0?false:true">
+			<label class="col-sm-3 control-label">Password:</label>
+			<div class="col-sm-9">
+				<input type="password" class="form-control"
+					placeholder="Ingrese password" ng-model="users.password"
+					ng-required="users.id==0?true:false">
+			</div>
+		</div>
+	</div>
+
+	<div class="modal-footer">
+		<button type="button" tooltip-placement="left"
+			tooltip="Click para regresar a la lista"
+			class="btn btn-sm btn-default btn-addon" ng-click="regresar()">
+			<i class="fa fa-check-square"></i>Regresar
+		</button>
+		<button type="submit" class="btn btn-sm btn-success btn-addon"
+			ng-click="crud(1,cita)"
+			ng-disabled="formValidate.$invalid||!rucvalido||!emailvalido">
+			<i class="fa fa-save"></i>Insertar
+		</button>
+
+
+	</div>
+</form>
+
+

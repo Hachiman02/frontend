@@ -1,0 +1,3459 @@
+ app.controller('pacienteController',['$modal', '$scope', '$rootScope' ,'$http', '$modal', '$state', 'ngTableParams', '$q', '$filter', 'toaster','FileUploader',
+			function($modal, $scope ,$rootScope, $http, $modal, $state, ngTableParams, $q, $filter, toaster,FileUploader) {
+	  
+			$scope.paciente = {
+		"idpaciente": 0, 
+		"accion": "0",
+	}
+	
+	$scope.Colortpaf={
+					"color":"red"
+			};
+			
+	$scope.expanded = false;		
+	$scope.tpafval = function(){
+		if(tpaf == 0){
+			tpaf == true;
+		}else{
+			tpaf == false;
+		}
+	}
+	var CurrentUser=$rootScope.globals.currentUser.iddoctor.iddoctor;
+	var uploader = $scope.uploader = new FileUploader({
+		url : ""
+	}, function(response) {
+	});
+	
+	var apellido_paterno,apellido_materno;
+	if( $scope.paciente.apepat==undefined){
+		apellido_paterno=" ";
+	}else{
+		apellido_paterno=$scope.paciente.apepat;
+	}
+	
+	if( $scope.paciente.apemat==undefined){
+		apellido_materno=" ";
+	}else{
+		apellido_materno=$scope.paciente.apemat;
+	}
+	
+	$scope.nombrepaciente = $scope.paciente.nombre + apellido_paterno + apellido_materno;
+	$scope.accion = 1;
+	$scope.titulonavegacion = "Listado de áreas";
+	$scope.visible = false;
+	$scope.titulopaciente = "";
+	$scope.lspacienteodontograma = [];
+	$scope.lsEmpresa = [];
+	if ($state.current.name == "app.seg.paciente.hc") {
+		$state.go("app.seg.paciente");
+	}
+	$scope.filtrolike = function(n) {
+		$scope.accion = 3;
+		$scope.paciente.accion = n;
+		$scope.tableParamsPaciente.reload();
+	};
+	$scope.pacienteodontogramadiagnosticos = {
+		"idpacienteodontogramadiagnosticos": 0
+	}
+	$scope.visibles = function() {
+		$scope.accion = 1;
+		$scope.tableParamsPaciente.reload();
+	};
+
+	$scope.regresar = function() {
+		$state.go('app.seg.paciente');
+	};
+	$scope.novisibles = function() {
+		$scope.accion = 2;
+		$scope.tableParamsPaciente.reload();
+	};
+	$scope.retornaClientes = function() {
+		listar(0, 10);
+	}	
+	
+	$scope.anamnesis = {"accion":"0"};
+	$scope.exploracionfisica = {"accion":"0"};
+	
+	function listar(total, cantidad) {
+		
+		
+		var url = '';
+		if ($scope.accion == 3) {
+			url = "/paciente/like";
+			$scope.accion = $scope.paciente.accion;
+		} else {
+			$scope.paciente.accion = $scope.accion;
+			url = "/paciente/list";
+		}
+		return $scope.promise = $http.post($scope.services + url, {
+			"accion": $scope.accion
+			, "idempresa": $scope.app.settings.selectedClinica
+			,"estado":CurrentUser
+			, "offset": total
+			, "limit": cantidad
+		}).then(function(response) {   
+			if (typeof response.data === 'object') {
+				$scope.lsclientes = response.data.aaData;
+				return response.data;
+			} else {
+				return $q.reject(response.data);
+			}
+		}, function(response) {
+			return $q.reject(response.data);
+		});
+	};
+	
+	
+	var gradoinstitucion_otros={
+			"idgradoinstitucion":-1,
+			"descripcion":"Otros"
+	 }
+	$http.post($scope.services + '/gradoinstitucion/list', {
+		"accion": $scope.accion
+	}).then(function(response) {
+		$scope.gradoinstitucions = response.data.aaData;
+		$scope.gradoinstitucions.push(gradoinstitucion_otros);
+	}, function(x) {
+		toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+	});
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	var empresa_otros={
+			"idempresa":-1,
+			"razonsocial":"Otros"
+	 }
+	$http.post($scope.services + '/empresa/list', {
+		"accion": $scope.accion
+	}).then(function(response) {  	
+		$scope.lsEmpresa = response.data.aaData;
+	$scope.lsEmpresa.push(empresa_otros);
+	}, function(x) {
+		toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+	});
+	var ocupacion_otros={
+			"idocupacion":-1,
+			"razonsocial":"Otros"
+	 }
+	$http.post($scope.services + '/ocupacion/list', {
+		"accion": $scope.accion
+	}).then(function(response) {
+		$scope.ocupacions = response.data.aaData;
+	}, function(x) {
+		toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+	});
+	$scope.sino = [{
+		"id": 1
+		, "value": "Si"
+	}, {
+		"id": 0
+		, "value": "No"
+	}]
+	$scope.sexox = [{
+		"id": 1
+		, "value": "Masculino"
+	}, {
+		"id": 2
+		, "value": "Femenino"
+	}]
+	$scope.estadoscivil = [{
+		"id": 1
+		, "value": "Soltero"
+	}, {
+		"id": 2
+		, "value": "Conviviente"
+	}, {
+		"id": 3
+		, "value": "Viudo"
+	}, {
+		"id": 4
+		, "value": "Divorciado"
+	}, {
+		"id": 5
+		, "value": "Casado"
+	}]
+	$http.post($scope.services + '/ubigeo/dep', {}).then(function(response) {
+		$scope.ubigeos = response.data.aaData;
+	}, function(x) {
+		toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+	});
+	$scope.refresh = function() {
+		$scope.tableParamsPaciente.reload();
+	};
+	
+	$http.post($scope.services + '/servicio/list', {
+		"accion": 1
+	}).then(function(response) { 
+		$scope.servicios = response.data.aaData;
+	}, function(x) {
+		toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+	});	
+	
+	$scope.selcctratamiento = function(size, idval){
+		
+		var modalPaciente = $modal.open({
+			templateUrl: 'modalTratamientoController.html'
+			, controller: 'modalPacienteController'
+			, size: 'lg',
+			backdrop: 'static', keyboard: false,
+			resolve: {
+				service: function() {
+					return $scope.services;
+				}
+				, idval: function() {
+					return idval;
+				}
+				, selectedClinica: function() {
+					return $scope.app.settings.selectedClinica;
+				}
+				, paciente: function() {
+					return $scope.paciente;
+				}
+			}
+		});
+		modalPaciente.result.then(function(selectedItem) {
+			$scope.tableParamsPaciente.reload();
+			$scope.tableParamsTratamiento.reload();
+		 	$scope.tableParamsPresupuesto.reload();
+
+
+		}, function() {});
+	}
+	
+
+    $scope.reporte=function(){
+    	 
+    return $scope.promise=  $http.post($scope.services + '/reporte/pdf',{
+    		"idpacienteodontograma":39
+        }, {
+            responseType: "arraybuffer"
+        })
+        .success(function (data) {
+        	 
+            var file = new Blob([data], {
+                type: 'application/pdf'
+            });
+        	 
+            var fileURL = URL.createObjectURL(file);
+            window.open(fileURL);
+        });
+    
+    	
+    }
+
+	
+	$scope.nuevo = function(size, idval) {
+		 
+		var modalPaciente = $modal.open({
+			templateUrl: 'modalPacienteController.html'
+			, controller: 'modalPacienteController'
+			, size: 'lg'
+			,backdrop: 'static', keyboard: false, 
+			resolve: {
+				service: function() {
+					return $scope.services;
+				}
+				, idval: function() {
+					return idval;
+				}
+				, selectedClinica: function() {
+					return $scope.app.settings.selectedClinica;
+				}
+				, paciente: function() {
+					return $scope.paciente;
+				}
+			}
+		});
+		modalPaciente.result.then(function(selectedItem) {
+			$scope.tableParamsPaciente.reload();
+		}, function() {});
+	};
+	
+	$scope.tableParamsPaciente = new ngTableParams({
+		page: 1, // show first page
+		count: $scope.cantidadderegistrosporpagina, // count per page
+		sorting: {
+			name: 'asc' // initial sorting
+		}
+	}, {
+		getData: function($defer, params) {
+			if ($scope.accion == -1) {} else {
+				if (params.page() == 1) {
+					listar((params.page() * params.count()) - params.count(), params.count()).then(function(data) {
+						
+						var filteredData = params.filter() ? $filter('filter')(data.aaData, params.filter()) : data.aaData;
+						var orderedData = params.sorting() ? $filter('orderBy')(filteredData, params.orderBy()) : filteredData;
+						$scope.obj = orderedData.slice(
+							(params.page() - 1) * params.count(), params.page() * params.count());
+						params.total(data.cantidad);
+						$defer.resolve($scope.obj);
+					});
+				} else {
+					listar((params.page() * params.count()) - params.count(), params.count()).then(function(datac) {
+						$defer.resolve(datac.aaData);
+					});
+				}
+			}
+		}
+	}, function(error) {
+		
+	});
+	$scope.nuevoPacienteOdontograma = function(size, idval, idpaciente) {
+		 
+		var modalPacienteodontograma = $modal.open({
+			templateUrl: 'modalPacienteodontogramaController.html'
+			, controller: 'modalPacienteodontogramaController'
+			, size: size
+			,backdrop: 'static', keyboard: false,
+			resolve: {
+				service: function() {
+					return $scope.services;
+				}
+				, idval: function() {
+					return idval;
+				}
+				, idpaciente: function() {
+					return idpaciente;
+				}
+				, selectedClinica: function() {
+					return $scope.app.settings.selectedClinica;
+				}
+			}
+		});
+		modalPacienteodontograma.result.then(function(selectedItem) {
+			$scope.pacienteodontogramadiagnosticos.idpacienteodontograma = selectedItem.idpacienteodontograma;
+			$scope.lspacienteodontograma.push(selectedItem);
+		}, function() {});
+	};
+	
+	
+	$scope.selectDiagnostico = {};
+	$scope.retornaOdontrograma = function() {
+		$scope.superiorDerecho = [];
+		$scope.superiorIzquierdo = [];
+		$scope.inferiorIzquierdo = [];
+		$scope.inferiorDerecho = [];
+		$scope.superiorDerechob = [];
+		$scope.superiorIzquierdob = [];
+		$scope.inferiorIzquierdob = [];
+		$scope.inferiorDerechob = [];
+		 $http.post($scope.services + '/odontrograma/porposicion', {
+			"accion": "desc"
+			, "imagen": "1"
+			, "idpacienteodontograma": $scope.pacienteodontogramadiagnosticos.idpacienteodontograma
+			, "idpaciente": $scope.paciente.idpaciente
+		}).then(function(response) {
+			if (response.data.estado == 1) {
+				$scope.superiorDerecho = response.data.aaData;
+				generaimgsd();
+			} else {
+				toaster.pop("error", "", "No es posible retornar el odontongrama", 800, 'trustedHtml');
+			}
+		}, function(x) {
+			toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+		});
+		 $http.post($scope.services + '/odontrograma/porposicion', {
+			"accion": "asc"
+			, "imagen": "2"
+			, "idpacienteodontograma": $scope.pacienteodontogramadiagnosticos.idpacienteodontograma
+			, "idpaciente": $scope.paciente.idpaciente
+		}).then(function(response) {
+			if (response.data.estado == 1) {
+				$scope.superiorIzquierdo = response.data.aaData;
+				generaimgsi();
+			} else {
+				toaster.pop("error", "", "No es posible retornar el odontongrama", 800, 'trustedHtml');
+			}
+		}, function(x) {
+			toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+		});
+		$http.post($scope.services + '/odontrograma/porposicion', {
+			"accion": "asc"
+			, "imagen": "3"
+			, "idpacienteodontograma": $scope.pacienteodontogramadiagnosticos.idpacienteodontograma
+			, "idpaciente": $scope.paciente.idpaciente
+		}).then(function(response) {
+			if (response.data.estado == 1) {
+				$scope.inferiorIzquierdo = response.data.aaData;
+				generaimgii();
+			} else {
+				toaster.pop("error", "", "No es posible retornar el odontongrama", 800, 'trustedHtml');
+			}
+		}, function(x) {
+			toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+		});
+		$http.post($scope.services + '/odontrograma/porposicion', {
+			"accion": "desc"
+			, "imagen": "4"
+			, "idpacienteodontograma": $scope.pacienteodontogramadiagnosticos.idpacienteodontograma
+			, "idpaciente": $scope.paciente.idpaciente
+		}).then(function(response) {
+			if (response.data.estado == 1) {
+				$scope.inferiorDerecho = response.data.aaData;
+				generaimgid();
+			} else {
+				toaster.pop("error", "", "No es posible retornar el odontongrama", 800, 'trustedHtml');
+			}
+		}, function(x) {
+			toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+		});
+		 $http.post($scope.services + '/odontrograma/porposicion', {
+			"accion": "desc"
+			, "imagen": "5"
+			, "idpacienteodontograma": $scope.pacienteodontogramadiagnosticos.idpacienteodontograma
+			, "idpaciente": $scope.paciente.idpaciente
+		}).then(function(response) {
+			if (response.data.estado == 1) {
+				$scope.superiorDerechob = response.data.aaData;
+				generaimgsdb();
+			} else {
+				toaster.pop("error", "", "No es posible retornar el odontongrama", 800, 'trustedHtml');
+			}
+		}, function(x) {
+			toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+		});
+		 $http.post($scope.services + '/odontrograma/porposicion', {
+			"accion": "asc"
+			, "imagen": "6"
+			, "idpacienteodontograma": $scope.pacienteodontogramadiagnosticos.idpacienteodontograma
+			, "idpaciente": $scope.paciente.idpaciente
+		}).then(function(response) {
+			if (response.data.estado == 1) {
+				$scope.superiorIzquierdob = response.data.aaData;
+				generaimgsib();
+			} else {
+				toaster.pop("error", "", "No es posible retornar el odontongrama", 800, 'trustedHtml');
+			}
+		}, function(x) {
+			toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+		});
+		 $http.post($scope.services + '/odontrograma/porposicion', {
+			"accion": "asc"
+			, "imagen": "7"
+			, "idpacienteodontograma": $scope.pacienteodontogramadiagnosticos.idpacienteodontograma
+			, "idpaciente": $scope.paciente.idpaciente
+		}).then(function(response) {
+			if (response.data.estado == 1) {
+				$scope.inferiorIzquierdob = response.data.aaData;
+				generaimgiib();
+			} else {
+				toaster.pop("error", "", "No es posible retornar el odontongrama", 800, 'trustedHtml');
+			}
+		}, function(x) {
+			toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+		});
+		 $http.post($scope.services + '/odontrograma/porposicion', {
+			"accion": "desc"
+			, "imagen": "8"
+			, "idpacienteodontograma": $scope.pacienteodontogramadiagnosticos.idpacienteodontograma
+			, "idpaciente": $scope.paciente.idpaciente
+		}).then(function(response) {
+			if (response.data.estado == 1) {
+				$scope.inferiorDerechob = response.data.aaData;
+				generaimgidb();
+			} else {
+				toaster.pop("error", "", "No es posible retornar el odontongrama", 800, 'trustedHtml');
+			}
+		}, function(x) {
+			toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+		});
+		
+	}
+	
+	function generaimgsd(){
+		
+		var iddiagnostico;
+			for(var i=0;i<$scope.superiorDerecho.length;i++){
+				var cod=$scope.superiorDerecho[i].niveldientepd.numero+$scope.superiorDerecho[i].niveldientesd.numero;
+				for(var j=0;j<$scope.superiorDerecho[i].lsPacienteodontogramadiagnosticos.length;j++){
+					iddiagnostico=$scope.superiorDerecho[i].lsPacienteodontogramadiagnosticos[j].iddiagnostico;
+					if(iddiagnostico>0){			
+						/* iddiagnostico:
+						   Caries 					: 1
+						   Sellante 				: 9
+						   Diente ausente(pieza)	: 3
+						   Diente por extraer(xtrac indicada): 4
+						   Restauracion 			: 2  *
+						   Diente no erupcionado	: 5  * 
+						   Corona por cambiar		: 6  *
+						   Corona en buen estado	: 7  *
+						   Puente 					: 8  * */					
+					switch(iddiagnostico){
+		        				case 9: 
+									  // setear "S" en recuadro de apoyo( correspondiente al diente $scope.superiorDerecho[i] 
+										break;
+								case 3: 
+									// Imagen con X azul
+									cod=cod+iddiagnostico;
+					 					break;
+								case 4: 
+									// Imagen con X roja
+									cod=cod+iddiagnostico;
+										break;
+								 case 5:
+									 // Imagen con X negra
+									 cod=cod+iddiagnostico;
+										break;
+								case 6: 
+									// Imagen con circulo rojo
+										break;
+								case 7: 
+									//Imagen con circulo azul
+										break;
+								case 8: 
+									// Imagen con Puente? 
+										break;
+								default :
+									// Imagen con marca azul,negra.
+									cod=cod
+									+$scope.superiorDerecho[i].lsPacienteodontogramadiagnosticos[j].accionesodontograma.codigo
+									+iddiagnostico;
+						}
+					}
+				}
+				if(cod != $scope.superiorDerecho[i].niveldientepd.numero+$scope.superiorDerecho[i].niveldientesd.numero){
+					$scope.superiorDerecho[i].img=cod+".png";
+				}else{
+					$scope.superiorDerecho[i].img=$scope.superiorDerecho[i].imagen;
+				}
+			}
+		}
+
+function generaimgsi(){
+	for(var i=0;i<$scope.superiorIzquierdo.length;i++){
+		var cod=$scope.superiorIzquierdo[i].niveldientepd.numero+$scope.superiorIzquierdo[i].niveldientesd.numero;
+		for(var j=0;j<$scope.superiorIzquierdo[i].lsPacienteodontogramadiagnosticos.length;j++){
+			if($scope.superiorIzquierdo[i].lsPacienteodontogramadiagnosticos[j].iddiagnostico>0){
+				cod=cod+$scope.superiorIzquierdo[i].lsPacienteodontogramadiagnosticos[j].accionesodontograma.codigo;
+			}
+		}
+		if(cod != $scope.superiorIzquierdo[i].niveldientepd.numero+$scope.superiorIzquierdo[i].niveldientesd.numero){
+			$scope.superiorIzquierdo[i].img=cod+".png";
+		}else{
+			$scope.superiorIzquierdo[i].img=$scope.superiorIzquierdo[i].imagen;
+		}
+	}
+}
+
+function generaimgii(){
+	for(var i=0;i<$scope.inferiorIzquierdo.length;i++){
+		var cod=$scope.inferiorIzquierdo[i].niveldientepd.numero+$scope.inferiorIzquierdo[i].niveldientesd.numero;
+		for(var j=0;j<$scope.inferiorIzquierdo[i].lsPacienteodontogramadiagnosticos.length;j++){
+			if($scope.inferiorIzquierdo[i].lsPacienteodontogramadiagnosticos[j].iddiagnostico>0){
+				cod=cod+$scope.inferiorIzquierdo[i].lsPacienteodontogramadiagnosticos[j].accionesodontograma.codigo;
+			}
+		}
+		if(cod != $scope.inferiorIzquierdo[i].niveldientepd.numero+$scope.inferiorIzquierdo[i].niveldientesd.numero){
+			$scope.inferiorIzquierdo[i].img=cod+".png";
+		}else{
+			$scope.inferiorIzquierdo[i].img=$scope.inferiorIzquierdo[i].imagen;
+		}
+	}
+}
+
+function generaimgid(){
+	for(var i=0;i<$scope.inferiorDerecho.length;i++){
+		var cod=$scope.inferiorDerecho[i].niveldientepd.numero+$scope.inferiorDerecho[i].niveldientesd.numero;
+		for(var j=0;j<$scope.inferiorDerecho[i].lsPacienteodontogramadiagnosticos.length;j++){
+			if($scope.inferiorDerecho[i].lsPacienteodontogramadiagnosticos[j].iddiagnostico>0){
+				cod=cod+$scope.inferiorDerecho[i].lsPacienteodontogramadiagnosticos[j].accionesodontograma.codigo;
+			}
+		}
+		if(cod != $scope.inferiorDerecho[i].niveldientepd.numero+$scope.inferiorDerecho[i].niveldientesd.numero){
+			$scope.inferiorDerecho[i].img=cod+".png";
+		}else{
+			$scope.inferiorDerecho[i].img=$scope.inferiorDerecho[i].imagen;
+		}
+	}
+}
+
+function generaimgsdb(){
+	for(var i=0;i<$scope.superiorDerechob.length;i++){
+		var cod=$scope.superiorDerechob[i].niveldientepd.numero+$scope.superiorDerechob[i].niveldientesd.numero;
+		for(var j=0;j<$scope.superiorDerechob[i].lsPacienteodontogramadiagnosticos.length;j++){
+			if($scope.superiorDerechob[i].lsPacienteodontogramadiagnosticos[j].iddiagnostico>0){
+				cod=cod+$scope.superiorDerechob[i].lsPacienteodontogramadiagnosticos[j].accionesodontograma.codigo;
+			}
+		}
+		if(cod != $scope.superiorDerechob[i].niveldientepd.numero+$scope.superiorDerechob[i].niveldientesd.numero){
+			$scope.superiorDerechob[i].img=cod+".png";
+		}else{
+			$scope.superiorDerechob[i].img=$scope.superiorDerechob[i].imagen;
+		}
+	}
+}
+
+function generaimgsib(){
+	for(var i=0;i<$scope.superiorIzquierdob.length;i++){
+		var cod=$scope.superiorIzquierdob[i].niveldientepd.numero+$scope.superiorIzquierdob[i].niveldientesd.numero;
+		for(var j=0;j<$scope.superiorIzquierdob[i].lsPacienteodontogramadiagnosticos.length;j++){
+			if($scope.superiorIzquierdob[i].lsPacienteodontogramadiagnosticos[j].iddiagnostico>0){
+				cod=cod+$scope.superiorIzquierdob[i].lsPacienteodontogramadiagnosticos[j].accionesodontograma.codigo;
+			}
+		}
+		if(cod != $scope.superiorIzquierdob[i].niveldientepd.numero+$scope.superiorIzquierdob[i].niveldientesd.numero){
+			$scope.superiorIzquierdob[i].img=cod+".png";
+		}else{
+			$scope.superiorIzquierdob[i].img=$scope.superiorIzquierdob[i].imagen;
+		}
+	}
+}
+
+function generaimgiib(){debugger
+	for(var i=0;i<$scope.inferiorIzquierdob.length;i++){
+		var cod=$scope.inferiorIzquierdob[i].niveldientepd.numero+$scope.inferiorIzquierdob[i].niveldientesd.numero;
+		for(var j=0;j<$scope.inferiorIzquierdob[i].lsPacienteodontogramadiagnosticos.length;j++){
+			if($scope.inferiorIzquierdob[i].lsPacienteodontogramadiagnosticos[j].iddiagnostico>0){
+				cod=cod+$scope.inferiorIzquierdob[i].lsPacienteodontogramadiagnosticos[j].accionesodontograma.codigo;
+			}
+		}
+		if(cod != $scope.inferiorIzquierdob[i].niveldientepd.numero+$scope.inferiorIzquierdob[i].niveldientesd.numero){
+			$scope.inferiorIzquierdob[i].img=cod+".png";
+		}else{
+			$scope.inferiorIzquierdob[i].img=$scope.inferiorIzquierdob[i].imagen;
+		}
+	}
+}
+
+function generaimgidb(){
+	for(var i=0;i<$scope.inferiorDerechob.length;i++){
+		var cod=$scope.inferiorDerechob[i].niveldientepd.numero+$scope.inferiorDerechob[i].niveldientesd.numero;
+		for(var j=0;j<$scope.inferiorDerechob[i].lsPacienteodontogramadiagnosticos.length;j++){
+			if($scope.inferiorDerechob[i].lsPacienteodontogramadiagnosticos[j].iddiagnostico>0){
+				cod=cod+$scope.inferiorDerechob[i].lsPacienteodontogramadiagnosticos[j].accionesodontograma.codigo;
+			}
+		}
+		if(cod != $scope.inferiorDerechob[i].niveldientepd.numero+$scope.inferiorDerechob[i].niveldientesd.numero){
+			$scope.inferiorDerechob[i].img=cod+".png";
+		}else{
+			$scope.inferiorDerechob[i].img=$scope.inferiorDerechob[i].imagen;
+		}
+	}
+}
+
+$scope.con = {};
+$scope.con.accion="0";
+	
+	$scope.seleccionapaciente = function(mail) {
+	 
+		$scope.pacienteanamnesis={};
+	 	$scope.accion = 0;
+		$scope.paciente={};
+		$scope.anamnesis={};
+		$scope.anamnesis.estado=0;
+		$scope.exploracionfisica={};
+		$scope.antecedente={};
+		$scope.lsarrays = [];
+		$scope.detalleantecedente=[];
+		$scope.con = 0;
+		/*-----------Agregado----------------*/
+		$scope.tpre=0;
+		$scope.tabo=0;
+		$scope.tpaf=0;
+		/*-----------------------------------*/
+		
+		$http.post($scope.services + '/paciente/finid', {
+			"idpaciente": mail
+		}).then(function(response) {
+			if(response.data.estado==1){
+			$scope.paciente = response.data.defaultObj;
+			$http.post($scope.services + '/diagdef/list',{"idpaciente":$scope.paciente.idpaciente,"accion":''}).then(function(response){
+				if(response.data.estado != 0){
+				$scope.diagnosticodef=response.data.defaultObj;
+				var lis=[];
+				var k=0
+				for(var t=0;t<$scope.diagnosticodef.lssubdiag.length;t++){
+					var oj={"descripcion":'',"bloqn":true,"bloq":true,"bloql":true};
+					lis.push(oj);
+					lis[k].descripcion=$scope.diagnosticodef.lssubdiag[t].descripcion;
+					for(var y=0;y<$scope.diagnosticodef.lssubdiag[t].lsdetalle.length;y++){
+						lis[k].servista=$scope.diagnosticodef.lssubdiag[t].lsdetalle[y].servicio.descripcion;
+						var ob2={"bloq":true,"bloql":true};
+						if($scope.diagnosticodef.lssubdiag[t].lsdetalle.length-y != 1){
+						lis.push(ob2);
+						k=k+1;
+						}else{
+						lis[k].lsdetalle=$scope.diagnosticodef.lssubdiag[t].lsdetalle;
+						k=k+1;
+						}
+					}
+				}
+				$scope.lssubdiagno=lis;
+				console.log("lis",$scope.lssubdiagno)
+				}else{
+					$scope.lssubdiagno=[];
+				}
+			}, function(x) {
+				toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+			});
+			$state.go('app.seg.paciente.hc');
+			$scope.paciente.fechanacimientostr = $filter('date')($scope.paciente.fechanacimiento, "dd-MM-yyyy")
+			$scope.titulopaciente = "Actualizar";
+			/*--------------------------------------Agregado-----------------------------------------------*/
+			if( $scope.paciente.apepat==undefined){
+				apellido_paterno=" ";
+			}else{
+				apellido_paterno=$scope.paciente.apepat;
+			}
+			
+			if( $scope.paciente.apemat==undefined){
+				apellido_materno=" ";
+			}else{
+				apellido_materno=$scope.paciente.apemat;
+			}
+			$scope.nombrepaciente = $scope.paciente.nombre +" "+ apellido_paterno +" "+ apellido_materno;
+			/*----------------------------------------------------------------------------------------------*/
+			$http.post($scope.services + '/anamnesis/finid', {
+				"idpaciente":  $scope.paciente.idpaciente
+			}).then(function(response) {
+				if(response.data.estado==1){
+					$scope.anamnesis = response.data.defaultObj;
+					/*---------------------------------------*/
+					$http.post($scope.services + '/exploracionfisica/finid', {
+						"idanamnesis": $scope.anamnesis.idanamnesis
+					}).then(function(response) {
+						if(response.data.estado==1){
+							$scope.exploracionfisica = response.data.defaultObj;
+					    }
+					}, function(x) {
+						toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+					});
+					/*---------------------------------------*/
+					$http.post($scope.services + '/antecedente/finid', {
+						"idanamnesis": $scope.anamnesis.idanamnesis
+					}).then(function(response) {debugger
+						if(response.data.estado==1){
+							$scope.antecedente = response.data.defaultObj;
+							/*---------------------------------------*/
+							$http.post($scope.services + '/detalleantecedente/listenfer', {
+								"idantecedente": $scope.antecedente.idantecedente
+							}).then(function(response) {debugger
+								if(response.data.estado==1){
+									var detalleantecedente = response.data.aaData;
+									$scope.detalleantecedente = response.data.aaData;
+									
+									for(var i=0; i<$scope.lsarrays.length;i++){
+										for(var j=0; j<$scope.lsarrays[i].length;j++){
+											for(var k=0; k<$scope.detalleantecedente.length;k++){
+												if($scope.lsarrays[i][j].idenfermedad == $scope.detalleantecedente[k].idenfermedad){
+													if(detalleantecedente[k].observacion != ""){
+														$scope.lsarrays[i][j].observacion=$scope.detalleantecedente[k].observacion;
+													}
+													break;
+												}else{
+													$scope.lsarrays[i][j].observacion=null;
+												}
+												if($scope.lsarrays[i][j].observacion == ""){
+													$scope.lsarrays[i][j].splice(6,1);
+												}
+											}
+										}
+									}
+									console.log("$scope.lsarrays",$scope.lsarrays);
+							    }
+							}, function(x) {
+								toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+							});
+							/*---------------------------------------*/
+					    }
+					}, function(x) {
+						toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');	
+					});
+			    }
+			}, function(x) {
+				toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+			});
+			
+			
+			/*----------------------------------------------------------------------------------------------*/
+			$http.post($scope.services + '/enfermedadantecedente/list', {
+				"accion": $scope.accion
+				}).then(function(response) {debugger
+					var lsenfer=[];
+					var lsenfer=response.data.aaData;
+					var lsfinal=[];
+					var max = parseInt(response.data.aaData.length / 3);
+					var c=1;
+					for(var i = 0 ; i < max ; i++){
+						var lstmp=[];
+						for(var j = c*3-3 ; j < c*3 ; j++){
+							lstmp.push(lsenfer[j]);
+						}
+						c++;
+						lsfinal.push(lstmp);
+					}
+					var lstmp=[];
+					for(var i = (c-1)*3 ; i < lsenfer.length ; i++){
+						lstmp.push(lsenfer[i]);
+					}
+					lsfinal.push(lstmp);
+					$scope.lsarrays = lsfinal;
+			}, function(x) {
+				toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+			});
+			/*----------------------------------------------------------------------------------------------*/
+			
+			
+			
+			
+			
+			if ($scope.paciente.idubigeo == undefined) {} else {
+				$http.post($scope.services + '/ubigeo/finid/', {
+					"idubigeo": $scope.paciente.idubigeo
+				}).then(function(response) {
+					$scope.ubigeo = response.data.defaultObj;
+					$http.post($scope.services + '/ubigeo/prov/', {
+						"departamento": $scope.ubigeo.departamento
+					}).then(function(a) {
+						$scope.provincias = a.data.aaData;
+						$http.post($scope.services + '/ubigeo/dist/', {
+							"provincia": $scope.ubigeo.provincia
+						}).then(function(b) {
+							$scope.distritos = b.data.aaData;
+							$scope.departamento = $scope.ubigeo.departamento;
+							$scope.provincia = $scope.ubigeo.provincia;
+							
+						}, function(x) {
+							toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+						});
+					}, function(x) {
+						toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+					});
+					$scope.cuentasbancariasclientes = {};
+				}, function(x) {
+					toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+				});
+			}
+			if ($scope.paciente.estado = 1) {
+				$scope.paciente.estado = true;
+			} else {
+				$scope.paciente.estado = false;
+			}
+			$scope.promise = $http.post($scope.services + '/pacienteodontograma/porpaciente', {
+				"idpaciente": $scope.paciente.idpaciente
+				, "accion": 0
+			}).then(function(response) {
+				$scope.lspacienteodontograma = [];
+				$scope.lspacienteodontograma = response.data.aaData;
+				if ($scope.lspacienteodontograma.length > 0) {
+					$scope.pacienteodontogramadiagnosticos.idpacienteodontograma = $scope.lspacienteodontograma[0].idpacienteodontograma;
+				} else {
+					$scope.nuevoPacienteOdontograma('', 0, $scope.paciente.idpaciente);
+				}
+			}, function(x) {
+				toaster.pop("error", "", "No es posible conectarse con el servicio web" + x, 800, 'trustedHtml');
+			});
+			
+			
+			
+			var subarray = 1 ;
+			$scope.bloqAE=false
+			$scope.bloqSave=true;
+		    $scope.evolucion = {
+		    		"idpaciente":$scope.paciente.idpaciente,
+		    		"accion":1,
+		    		"altapaciente":altapaciente,
+		    		"subarray":subarray,
+		    		"fecharegistroVista":''
+		    };
+			
+		    //$scope.evolucion = $scope.lsEvolucion;
+		    
+			$scope.listarEvo = function(){ 
+				$scope.bloqSave=true;
+			    $scope.promise = $http.post($scope.services+'/evolucion/list',$scope.evolucion)
+			    		  .then(function (response) {  debugger
+			        if (typeof response.data === 'object') {
+			        	$scope.lsEvolucion = response.data.aaData;
+			        	
+			        	$scope.tableParamsEvolucion.reload();
+			        } else {
+			            return $q.reject(response.data);
+			        }
+			    }, function (response) {
+			        return $q.reject(response.data);
+			    });
+		    }
+			$scope.listarEvo();
+			
+			$scope.tableParamsEvolucion = new ngTableParams()
+		    var observacion;
+			var altapaciente;
+		    
+		    $scope.agregarEvolucion = function(){ 
+		    	var f =new Date();
+		    	$scope.lssubevo=[];
+		    	//$scope.bloq ={"valueAE":false,"valueInP":false};
+		    	$scope.lsEvolucionPrima =[];
+		    	$scope.bloqAE=true;
+		    	console.log("idpaciente: ",$scope.paciente.idpaciente);
+		    	$scope.evolucion = {
+		    			"fecharegistro":f,
+		    			"fecharegistroVista":f,
+		    			"observacion":observacion,
+		    			"idpaciente":$scope.paciente.idpaciente,
+		    			"accion":'',
+		    			"altapaciente":altapaciente,
+		    			"estado":1,
+		    			"subarray":2,
+		    			"bloqAE":false,
+		    			//"sw":true
+		    			//"bloqADE":true
+		    	};
+		    	
+		    	if($scope.lsEvolucion != ''){
+		    		$scope.lsEvolucionPrima.push($scope.evolucion);
+		    	}else{
+		    		$scope.lsEvolucionPrima.push($scope.evolucion);
+		    	}
+		    	
+		    	if($scope.lsEvolucion!=''){
+		    		$scope.lsEvolucion[$scope.lsEvolucion.length-1]["bloqADE"]=true;
+		    	}
+		    	
+		    	for(var i=0;i<$scope.lsEvolucionPrima.length;i++){
+		    		$scope.lsEvolucion.push($scope.lsEvolucionPrima[i]);
+		    		$scope.lsEvolucionAcumula.push($scope.lsEvolucionPrima[i]);
+	    		}
+		    	
+		    	if($scope.evolucion.observacion == null){
+		    		$scope.bloqSave=true;
+		    	}else{
+		    		$scope.bloqSave=false;
+		    	}
+		    	
+		    	$scope.detalleEvolucion={
+			    		"lssubevo": $scope.lsEvolucionAcumula,
+			    		"idpaciente":$scope.paciente.idpaciente,
+			    		"altapaciente":$scope.obs.altapaciente
+			    };
+		    	
+		    	$scope.tableParamsEvolucion.reload();
+		   
+		    }
+		    
+		    $scope.validateSave = function(){ 
+		    	var c=0;
+		    	for(var i=0;i<$scope.lsEvolucion.length;i++){
+		    		if($scope.lsEvolucion[i].observacion == null || $scope.lsEvolucion[i].observacion == ''){
+		    			c++;
+		    			//$scope.bloqSave=true;
+		    		//}else{
+		    			//$scope.bloqSave=false;
+		    		}
+		    		
+		    	}
+		    	if(c==0){
+	    			$scope.bloqSave=false;
+	    		}else{
+	    			$scope.bloqSave=true;
+	    		}
+		    }
+		    
+		    $scope.crudEvolcuion = function(val,mail){ 
+		    		
+		    		if ($scope.evolucion.estado == true) {
+		    			$scope.evolucion.estado = 1;
+		    		} else {
+		    			$scope.evolucion.estado = 0;
+		    		}
+		    		if (val == 1) {
+		    			$scope.evolucion.accion = '';
+		    		} else {
+		    			$scope.evolucion = mail;
+		    			$scope.evolucion.accion = "D";
+		    		};
+		    		
+		    		$scope.evolucion.estado = 1;
+		    		$scope.bloqAE=false;
+		    		$scope.bloqSave=true;
+					$scope.promise = $http.post($scope.services + '/evolucion/insertaList',$scope.detalleEvolucion)
+					.then(function(response) { 
+						if (response.data.estado == 1) {
+							//$scope.evolucion=response.data.defaultObj;
+							//for(var i=0;i<$scope.lsEvolucionAcumula.length;i++){
+								//$scope.lsEvolucion.push($scope.lsEvolucionAcumula[i])
+							//}
+							$scope.listarEvo();
+							$scope.lsEvolucionAcumula=[];
+							toaster.pop("success", "", response.data.msg, 800, 'trustedHtml');
+						} else if (response.data.estado == 0) {
+							toaster.pop("success", "", response.data.msg, 800, 'trustedHtml');
+						} else if (response.data.estado == 2) {
+							toaster.pop("info", "", response.data.msg, 800, 'trustedHtml');
+						} else if (response.data.estado == 3) {
+							toaster.pop("error", "", response.data.msg, 800, 'trustedHtml');
+						} else {
+							toaster.pop("error", "", "Error inesperado en el cliente", 800, 'trustedHtml');
+						}
+						$scope.tableParamsEvolucion.reload();
+					}, function(x) {
+						toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+					});
+		    }
+		    
+		    
+		    $scope.eliminaEvo = function(val,mail){ 
+		    	if ($scope.evolucion.estado == true) {
+	    			$scope.evolucion.estado = 1;
+	    		} else {
+	    			$scope.evolucion.estado = 0;
+	    		}
+	    		if (val == 1) {
+	    			$scope.evolucion.accion = '';
+	    		} else {
+	    			$scope.evolucion = mail;
+	    			$scope.evolucion.accion = "D";
+	    		};
+	    		
+	    		$scope.evolucion.estado = 1;
+	    		$scope.bloqAE=false;
+	    		$scope.bloqSave=true;
+				$scope.promise = $http.post($scope.services + '/evolucion/elimina',$scope.evolucion)
+				.then(function(response) { 
+					if (response.data.estado == 1) {
+						//$scope.evolucion=response.data.defaultObj;
+						$scope.listarEvo();
+						toaster.pop("success", "", response.data.msg, 800, 'trustedHtml');
+					} else if (response.data.estado == 0) {
+						toaster.pop("success", "", response.data.msg, 800, 'trustedHtml');
+					} else if (response.data.estado == 2) {
+						toaster.pop("info", "", response.data.msg, 800, 'trustedHtml');
+					} else if (response.data.estado == 3) {
+						toaster.pop("error", "", response.data.msg, 800, 'trustedHtml');
+					} else {
+						toaster.pop("error", "", "Error inesperado en el cliente", 800, 'trustedHtml');
+					}
+					$scope.tableParamsEvolucion.reload();
+				}, function(x) {
+					toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+				});
+	    		
+	    		
+		    }
+		    
+		    
+		    $scope.obs ={};
+		    $scope.detalleEvolucion ={};
+		    
+		    $scope.lsEvolucionAcumula=[];
+		    
+		    $scope.addEvolucion = function(mail){ 
+		    	$scope.obsPrima={};
+		    	$scope.lsEvolucionPrima=[];
+		    	$scope.bloqAE=true;
+		    	var obsercacion;
+		    	$scope.obs = mail;
+		    	//$scope.bloq ={"valueAE":true,"valueInP":false};
+		    	
+			    $scope.obs = {
+		    			"fecharegistro":$scope.obs.fecharegistro,
+		    			"fecharegistroVista":$scope.obs.fecharegistroVista,
+			    		"observacion":observacion,
+		    			"idpaciente":$scope.paciente.idpaciente,
+		    			"accion":'',
+		    			"altapaciente":$scope.obs.altapaciente
+		    	};
+			    $scope.obsPrima = mail;
+			    $scope.obsPrima = {
+		    			"fecharegistro":'',
+		    			"fecharegistroVista":$scope.obs.fecharegistroVista,
+			    		"observacion":observacion,
+		    			"idpaciente":$scope.paciente.idpaciente,
+		    			"accion":'',
+		    			"altapaciente":$scope.obs.altapaciente,
+		    			"bloqAE":false,
+		    			"bloqSave":false,
+		    			"estadoSave":0
+		    	};
+			    $scope.evolucion = $scope.obsPrima;
+			    
+		    	$scope.lsEvolucionPrima.push($scope.obsPrima);
+		    	
+		    	$scope.lsEvolucion[$scope.lsEvolucion.length-1]["bloqADE"]=true;
+		    	
+		    	for(var i=0;i<$scope.lsEvolucionPrima.length;i++){
+		    		$scope.lsEvolucion.push($scope.lsEvolucionPrima[i]);
+		    		$scope.lsEvolucionAcumula.push($scope.lsEvolucionPrima[i]);
+	    		}
+		    	
+		    	
+		    	if($scope.obsPrima.observacion == null || $scope.obsPrima.observacion == ''){
+		    		$scope.bloqSave=true;
+		    	}else{
+		    		$scope.bloqSave=false;
+		    	}
+		    	
+		    	$scope.detalleEvolucion={
+			    		"lssubevo": $scope.lsEvolucionAcumula,
+			    		"idpaciente":$scope.paciente.idpaciente,
+			    		"altapaciente":$scope.obs.altapaciente
+			    };
+		    }
+		    $scope.deleteitem= function(index,mail){ debugger
+		    	$scope.lsEvolucion[$scope.lsEvolucion.length-1]["bloqADE"]=null;
+		    	
+		    	for(var i=0;i<$scope.lsEvolucionAcumula.length;i++){
+		    		if(mail===$scope.lsEvolucionAcumula[i]){
+		    			$scope.lsEvolucionAcumula.splice(i,1);
+		    			i=$scope.lsEvolucionAcumula.length;
+		    		}
+		    	}
+		    	$scope.lsEvolucion.splice(index, 1);
+		    	if($scope.lsEvolucion.length!=0){
+		    		var t =new Date();
+		    		var c =new Date($scope.lsEvolucion[$scope.lsEvolucion.length-1].fecharegistroVista);
+			   		//var c=Date.parse($scope.lsEvolucion[$scope.lsEvolucion.length-1].fecharegistroVista);
+			   		//Date.parse(c);
+			   		
+			   		day = t.getDate();
+			        month = parseInt(t.getMonth()) + 1;
+			        year = t.getFullYear();
+			        
+			   		//$scope.lsEvolucion.splice(index, 1);
+			    	if(day == c.getDate() && month==(parseInt(c.getMonth()) + 1) &&  year==c.getFullYear()){
+			    		$scope.lsEvolucion[$scope.lsEvolucion.length-1]["bloqADE"]=false;
+			    		if($scope.lsEvolucionAcumula.length==0){
+			    			$scope.bloqAE=false;
+			    		}else{
+			    			$scope.bloqAE=true;
+			    		}
+			    		
+			    	}else{
+			    		$scope.lsEvolucion[$scope.lsEvolucion.length-1]["bloqADE"]=true;
+			    		$scope.bloqAE=false;
+			    	}
+		    	}else{
+		    		$scope.bloqAE=false;
+		    	}
+		    	 $scope.validateSave();
+			   	 
+			   	 //$scope.lsEvolucion.splice(index, 1);
+			   	 //$scope.lsEvolucion[$scope.lsEvolucion.length-1]["bloqADE"]=false;
+			   	
+			}
+			
+			
+			
+			
+			
+		}
+			
+		}, function(x) {
+			toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+		});
+	}
+	$http.post($scope.services + '/diagnostico/list', {
+		"accion": 0
+	}).then(function(rre) {
+		$scope.lsdiagnosticos = rre.data.aaData;
+		console.log("$scope.lsdiagnosticos",$scope.lsdiagnosticos);
+		if ($scope.lsdiagnosticos.length > 0) {
+			$scope.selectDiagnostico = $scope.lsdiagnosticos[0];
+		}
+	}, function(x) {
+		toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+	});
+	$scope.bloqa=false;
+	$scope.gdi=true;
+	var lsserv=[];
+	var p=0;	
+	var idsertmp=0;
+	$scope.seteaservici=function(ser,i){
+		idsertmp=ser.idservicio;
+		if(lsserv.length>0){
+			for(var q=0;q<lsserv.length;q++){
+				if(idsertmp==lsserv[q].idservicio){
+					toaster.pop("info", "", "El servicio es repetido en el subdiagnostico. Favor seleccione otro.", 800, 'trustedHtml');
+					$select.selected.nombre='';
+					$scope.bloqa=true;
+				}else{
+					$scope.lssubdiagno[i].bloq=false;
+					$scope.bloqa=false;
+				}
+			}
+		}else{
+			$scope.bloqa=false;
+			$scope.lssubdiagno[i].bloq=false;
+		}		
+		
+		$scope.gdi=false;		
+	}
+	
+	$scope.agregadiagnostico=function(){
+		var obj={"descripcion":'',"bloqn":false,"bloq":true,"bloql":false};
+	if($scope.lssubdiagno.length>0){
+		if($scope.lssubdiagno[$scope.lssubdiagno.length-1].servista != undefined){
+			$scope.bloqa=true;
+			$scope.lssubdiagno.push(obj);	
+		}
+		else{
+		$scope.lssubdiagno[$scope.lssubdiagno.length-1].bloq=true;
+		$scope.lssubdiagno[$scope.lssubdiagno.length-1].bloql=true;
+		var ob={"idservicio":0};
+		lsserv.push(ob);
+		lsserv[p].idservicio=idsertmp;
+		lsserv[p].bloq=true;
+		$scope.lssubdiagno[$scope.lssubdiagno.length-1].lsdetalle=lsserv;
+		$scope.lssubdiagno[$scope.lssubdiagno.length-lsserv.length].bloqn=true;
+		lsserv=[];		
+		$scope.bloqa=true;
+		$scope.lssubdiagno.push(obj);
+		p=0;
+		}
+	}else{
+		$scope.bloqa=true;
+		$scope.lssubdiagno.push(obj);
+		}
+	}
+	$scope.agregarservi=function(i){
+		var obj2={"bloq":true,"bloql":false};
+		var ob={"idservicio":0};
+		lsserv.push(ob);
+		lsserv[p].idservicio=idsertmp;
+		lsserv[p].bloqueo=true;
+		p=p+1;		
+		$scope.lssubdiagno[i].bloql=true;
+		$scope.lssubdiagno[i].bloq=true;
+		$scope.lssubdiagno.push(obj2);
+		idsertmp=0;
+		$scope.bloqa=true;
+		$scope.gdi=true;
+	}
+	
+	$scope.evolucion={};
+	$scope.lsEvolucion =[];
+	
+	
+	
+	 
+	  
+	     
+	 
+	  $scope.lsParentezco=[{
+		  "descripcion": "Padre"
+	   },
+	  {
+		  "descripcion": "Madre"  
+	  },{
+		  "descripcion": "Apoderado"
+	  }
+	  ]
+	
+	$http.post($scope.services + '/gradoinstitucion/list', {
+		"accion": $scope.accion
+	}).then(function(response) {
+		$scope.gradoinstitucions = response.data.aaData;
+	}, function(x) {
+		toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+	});  
+	$http.post($scope.services + '/ocupacion/list', {  
+		"accion": $scope.accion
+	}).then(function(response) {  
+		$scope.ocupacions = response.data.aaData;
+	}, function(x) {
+		toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+	});
+	$scope.sexox = [{
+		"id": 1
+		, "value": "Masculino"
+	}, {
+		"id": 2
+		, "value": "Femenino" 
+	}]
+	$scope.estadoscivil = [{
+		"id": 1
+		, "value": "Soltero"
+	}, {
+		"id": 2
+		, "value": "Conviviente"
+	}, {
+		"id": 3
+		, "value": "Viudo"
+	}, {
+		"id": 4
+		, "value": "Divorciado"
+	}, {
+		"id": 5
+		, "value": "Casado"
+	}]
+	$scope.retornaProvincia = function(prov) {    
+		return $scope.promise = $http.post($scope.services + '/ubigeo/prov', {
+			"departamento": prov
+		}).then(function(response) {   
+			$scope.provincias = response.data.aaData;
+		}, function(x) {
+			toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+		});
+	};
+	$scope.retornaDistrito = function(dist) {  
+		return $scope.promise = $http.post($scope.services + '/ubigeo/dist', {
+			"provincia": dist
+		}).then(function(response) {  
+			$scope.distritos = response.data.aaData;
+		}, function(x) {
+			toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+		});
+	};
+
+//division dentadura(1-8),idodontograma,idaccionesodontograma,iddiagnostico,¿?
+	$scope.seteaValor = function(x, a, v, c,i) {
+	//	$scope.seteaValor = function(x, a, v, c) {    debugger
+			var accion="A";
+			debugger
+			switch(x){
+			case 1 :     // superiorDerecho
+				for ( var i=0;i<$scope.superiorDerecho.length;i++){
+					if($scope.superiorDerecho[i].idodontograma==a){
+						debugger
+						switch(c){
+			     		case 1:  //Marca's
+							for(var j=0;j<$scope.superiorDerecho[i].lsPacienteodontogramadiagnosticos.length;j++){
+						 		if($scope.superiorDerecho[i].lsPacienteodontogramadiagnosticos[j].idaccionesodontograma==v
+										&&$scope.superiorDerecho[i].lsPacienteodontogramadiagnosticos[j].iddiagnostico==c){
+									// diagnostico repetido  
+									if($scope.superiorDerecho[i].lsPacienteodontogramadiagnosticos[j].diagnostico!=undefined){
+										$scope.superiorDerecho[i].lsPacienteodontogramadiagnosticos[j].diagnostico=undefined;
+										j=$scope.superiorDerecho[i].lsPacienteodontogramadiagnosticos.length;
+										//setea la accion a eliminardiagnostico
+										 accion="ED";
+									}}};break;
+						case 2:  //Marca's
+							for(var j=0;j<$scope.superiorDerecho[i].lsPacienteodontogramadiagnosticos.length;j++){
+						 		if($scope.superiorDerecho[i].lsPacienteodontogramadiagnosticos[j].idaccionesodontograma==v
+										&&$scope.superiorDerecho[i].lsPacienteodontogramadiagnosticos[j].iddiagnostico==c){
+									// diagnostico repetido  
+									if($scope.superiorDerecho[i].lsPacienteodontogramadiagnosticos[j].diagnostico!=undefined){
+										$scope.superiorDerecho[i].lsPacienteodontogramadiagnosticos[j].diagnostico=undefined;
+										j=$scope.superiorDerecho[i].lsPacienteodontogramadiagnosticos.length;
+										//setea la accion a eliminardiagnostico
+										 accion="ED";
+									}}};break;
+						
+						case 6 :   // circulo's
+							;break;
+						case 7 :   // circulo's
+							;break;
+						case 8:  // puent's
+								break;
+						default :  // case 3,4,5 
+							for(var j=0;j<$scope.superiorDerecho[i].lsPacienteodontogramadiagnosticos.length;j++){
+								debugger
+						 		if($scope.superiorDerecho[i].lsPacienteodontogramadiagnosticos[j].iddiagnostico==c){
+									// diagnostico repetido  
+									if($scope.superiorDerecho[i].lsPacienteodontogramadiagnosticos[j].diagnostico!=undefined){
+										$scope.superiorDerecho[i].lsPacienteodontogramadiagnosticos[j].diagnostico=undefined;
+										j=$scope.superiorDerecho[i].lsPacienteodontogramadiagnosticos.length;
+										//setea la accion a eliminardiagnostico
+										 accion="ED";
+									}}};break;
+					 	}
+				 		i=$scope.superiorDerecho.length;
+			 	}
+				};break;
+			case 2 :     // superiorIzquierdo
+				for ( var i=0;i<$scope.superiorIzquierdo.length;i++){
+					if($scope.superiorIzquierdo[i].idodontograma==a){
+						for(var j=0;j<$scope.superiorIzquierdo[i].lsPacienteodontogramadiagnosticos.length;j++){
+							if($scope.superiorIzquierdo[i].lsPacienteodontogramadiagnosticos[j].idaccionesodontograma==v
+									&&$scope.superiorIzquierdo[i].lsPacienteodontogramadiagnosticos[j].iddiagnostico==c){
+								// diagnostico repetido  
+								if($scope.superiorIzquierdo[i].lsPacienteodontogramadiagnosticos[j].diagnostico!=undefined){
+									$scope.superiorIzquierdo[i].lsPacienteodontogramadiagnosticos[j].diagnostico=undefined;
+									j=$scope.superiorIzquierdo[i].lsPacienteodontogramadiagnosticos.length;
+									//setea la accion a eliminardiagnostico
+									 accion="ED";
+								}	
+				 			}
+			 			}
+						i=$scope.superiorIzquierdo.length;
+					}
+				};break;
+			case 5 :    //superiorDerechob
+				for ( var i=0;i<$scope.superiorDerechob.length;i++){
+					if($scope.superiorDerechob[i].idodontograma==a){
+						for(var j=0;j<$scope.superiorDerechob[i].lsPacienteodontogramadiagnosticos.length;j++){
+							if($scope.superiorDerechob[i].lsPacienteodontogramadiagnosticos[j].idaccionesodontograma==v
+									&&$scope.superiorDerechob[i].lsPacienteodontogramadiagnosticos[j].iddiagnostico==c){
+								// diagnostico repetido  
+								if($scope.superiorDerechob[i].lsPacienteodontogramadiagnosticos[j].diagnostico!=undefined){
+									$scope.superiorDerechob[i].lsPacienteodontogramadiagnosticos[j].diagnostico=undefined;
+									j=$scope.superiorDerechob[i].lsPacienteodontogramadiagnosticos.length;
+									//setea la accion a eliminardiagnostico
+									 accion="ED";
+								}	
+				 			}
+			 			}
+						i=$scope.superiorDerechob.length;
+					}
+				};break;
+			case 6 :    //superiorIzquierdob
+				for ( var i=0;i<$scope.superiorIzquierdob.length;i++){
+					if($scope.superiorIzquierdob[i].idodontograma==a){
+						for(var j=0;j<$scope.superiorIzquierdob[i].lsPacienteodontogramadiagnosticos.length;j++){
+							if($scope.superiorIzquierdob[i].lsPacienteodontogramadiagnosticos[j].idaccionesodontograma==v
+									&&$scope.superiorIzquierdob[i].lsPacienteodontogramadiagnosticos[j].iddiagnostico==c){
+								// diagnostico repetido  
+								if($scope.superiorIzquierdob[i].lsPacienteodontogramadiagnosticos[j].diagnostico!=undefined){
+									$scope.superiorIzquierdob[i].lsPacienteodontogramadiagnosticos[j].diagnostico=undefined;
+									j=$scope.superiorIzquierdob[i].lsPacienteodontogramadiagnosticos.length;
+									//setea la accion a eliminardiagnostico
+									 accion="ED";
+								}	
+				 			}
+			 			}
+						i=$scope.superiorIzquierdob.length;
+					}
+				};break;
+			case 8 :    //inferiorDerechob
+				for ( var i=0;i<$scope.inferiorDerechob.length;i++){
+					if($scope.inferiorDerechob[i].idodontograma==a){
+						for(var j=0;j<$scope.inferiorDerechob[i].lsPacienteodontogramadiagnosticos.length;j++){
+							if($scope.inferiorDerechob[i].lsPacienteodontogramadiagnosticos[j].idaccionesodontograma==v
+									&&$scope.inferiorDerechob[i].lsPacienteodontogramadiagnosticos[j].iddiagnostico==c){
+								// diagnostico repetido  
+								if($scope.inferiorDerechob[i].lsPacienteodontogramadiagnosticos[j].diagnostico!=undefined){
+									$scope.inferiorDerechob[i].lsPacienteodontogramadiagnosticos[j].diagnostico=undefined;
+									j=$scope.inferiorDerechob[i].lsPacienteodontogramadiagnosticos.length;
+									//setea la accion a eliminardiagnostico
+									 accion="ED";
+								}	
+				 			}
+			 			}
+						i=$scope.inferiorDerechob.length;
+					}
+				};break;
+			case 7 :    //inferiorIzquierdob
+				for ( var i=0;i<$scope.inferiorIzquierdob.length;i++){
+					if($scope.inferiorIzquierdob[i].idodontograma==a){
+						for(var j=0;j<$scope.inferiorIzquierdob[i].lsPacienteodontogramadiagnosticos.length;j++){
+							if($scope.inferiorIzquierdob[i].lsPacienteodontogramadiagnosticos[j].idaccionesodontograma==v
+									&&$scope.inferiorIzquierdob[i].lsPacienteodontogramadiagnosticos[j].iddiagnostico==c){
+								// diagnostico repetido  
+								if($scope.inferiorIzquierdob[i].lsPacienteodontogramadiagnosticos[j].diagnostico!=undefined){
+									$scope.inferiorIzquierdob[i].lsPacienteodontogramadiagnosticos[j].diagnostico=undefined;
+									j=$scope.inferiorIzquierdob[i].lsPacienteodontogramadiagnosticos.length;
+									//setea la accion a eliminardiagnostico
+									 accion="ED";
+								}	
+				 			}
+			 			}
+						i=$scope.inferiorIzquierdob.length;
+					}
+				};break;
+			case 4 :    //inferiorDerecho
+				for ( var i=0;i<$scope.inferiorDerecho.length;i++){
+					if($scope.inferiorDerecho[i].idodontograma==a){
+						for(var j=0;j<$scope.inferiorDerecho[i].lsPacienteodontogramadiagnosticos.length;j++){
+							if($scope.inferiorDerecho[i].lsPacienteodontogramadiagnosticos[j].idaccionesodontograma==v
+									&&$scope.inferiorDerecho[i].lsPacienteodontogramadiagnosticos[j].iddiagnostico==c){
+								// diagnostico repetido  
+								if($scope.inferiorDerecho[i].lsPacienteodontogramadiagnosticos[j].diagnostico!=undefined){
+									$scope.inferiorDerecho[i].lsPacienteodontogramadiagnosticos[j].diagnostico=undefined;
+									j=$scope.inferiorDerecho[i].lsPacienteodontogramadiagnosticos.length;
+									//setea la accion a eliminardiagnostico
+									 accion="ED";
+								}	
+				 			}
+			 			}
+						i=$scope.inferiorDerecho.length;
+					}
+				};break;
+			case 3 :    //inferiorIzquierdo
+				for ( var i=0;i<$scope.inferiorIzquierdo.length;i++){
+					if($scope.inferiorIzquierdo[i].idodontograma==a){
+						for(var j=0;j<$scope.inferiorIzquierdo[i].lsPacienteodontogramadiagnosticos.length;j++){
+							if($scope.inferiorIzquierdo[i].lsPacienteodontogramadiagnosticos[j].idaccionesodontograma==v
+									&&$scope.inferiorIzquierdo[i].lsPacienteodontogramadiagnosticos[j].iddiagnostico==c){
+								// diagnostico repetido  
+								if($scope.inferiorIzquierdo[i].lsPacienteodontogramadiagnosticos[j].diagnostico!=undefined){
+									$scope.inferiorIzquierdo[i].lsPacienteodontogramadiagnosticos[j].diagnostico=undefined;
+									j=$scope.inferiorIzquierdo[i].lsPacienteodontogramadiagnosticos.length;
+									//setea la accion a eliminardiagnostico
+									 accion="ED";
+								}	
+				 			}
+			 			}
+						i=$scope.inferiorIzquierdo.length;
+					}
+				};break;
+		 	}	
+		
+		
+		if (c > 0) {
+			$scope.pacienteodontogramadiagnosticos.iddiagnostico = c;
+			$scope.pacienteodontogramadiagnosticos.idaccionesodontograma = v;
+			$scope.pacienteodontogramadiagnosticos.idodontograma = a;
+			$scope.pacienteodontogramadiagnosticos.estado = 1;
+			$scope.pacienteodontogramadiagnosticos.descripcion = "";
+			$scope.pacienteodontogramadiagnosticos.accion =accion;
+			$scope.pacienteodontogramadiagnosticos.idpaciente=$scope.paciente.idpaciente;
+			$scope.pacienteodontogramadiagnosticos.imagen=""+x;
+			debugger
+			$http.post($scope.services + '/pacienteodontogramadiagnosticos/inserta', $scope.pacienteodontogramadiagnosticos).then(function(response) {
+				debugger
+				if (response.data.estado == 1) {
+					toaster.pop("error", "", "Diagnostico ingresado correctamente", 200, 'trustedHtml');
+					switch (x) {
+						case 1:
+							 
+							$scope.superiorDerecho = [];
+							$scope.promise = $http.post($scope.services + '/odontrograma/porposicion', {
+								"accion": "desc"
+								, "imagen": "1"
+								, "idpacienteodontograma": $scope.pacienteodontogramadiagnosticos.idpacienteodontograma
+								, "idpaciente": $scope.paciente.idpaciente
+							}).then(function(response) {
+								if (response.data.estado == 1) {
+									$scope.superiorDerecho = response.data.aaData;
+									generaimgsd();
+								} else {
+									toaster.pop("error", "", "No es posible retornar el odontongrama", 800, 'trustedHtml');
+								}
+							}, function(x) {
+								toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+							});
+							break;
+						case 2:
+							 
+							$scope.superiorIzquierdo = [];
+							$scope.promise = $http.post($scope.services + '/odontrograma/porposicion', {
+								"accion": "asc"
+								, "imagen": "2"
+								, "idpacienteodontograma": $scope.pacienteodontogramadiagnosticos.idpacienteodontograma
+								, "idpaciente": $scope.paciente.idpaciente
+							}).then(function(response) {
+								if (response.data.estado == 1) {
+									$scope.superiorIzquierdo = response.data.aaData;
+									generaimgsi();
+								} else {
+									toaster.pop("error", "", "No es posible retornar el odontongrama", 800, 'trustedHtml');
+								}
+							}, function(x) {
+								toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+							});
+							break
+						case 3:
+							$scope.inferiorIzquierdo = [];
+							$scope.promise = $http.post($scope.services + '/odontrograma/porposicion', {
+								"accion": "asc"
+								, "imagen": "3"
+								, "idpacienteodontograma": $scope.pacienteodontogramadiagnosticos.idpacienteodontograma
+								, "idpaciente": $scope.paciente.idpaciente
+							}).then(function(response) {
+								if (response.data.estado == 1) {
+									$scope.inferiorIzquierdo = response.data.aaData;
+									generaimgii();
+								} else {
+									toaster.pop("error", "", "No es posible retornar el odontongrama", 800, 'trustedHtml');
+								}
+							}, function(x) {
+								toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+							});
+							break
+						case 4:
+							$scope.inferiorDerecho = [];
+							$scope.promise = $http.post($scope.services + '/odontrograma/porposicion', {
+								"accion": "desc"
+								, "imagen": "4"
+								, "idpacienteodontograma": $scope.pacienteodontogramadiagnosticos.idpacienteodontograma
+								, "idpaciente": $scope.paciente.idpaciente
+							}).then(function(response) {
+								if (response.data.estado == 1) {
+									$scope.inferiorDerecho = response.data.aaData;
+									generaimgid();
+								} else {
+									toaster.pop("error", "", "No es posible retornar el odontongrama", 800, 'trustedHtml');
+								}
+							}, function(x) {
+								toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+							});
+							break
+						case 5:
+							$scope.superiorDerechob = [];
+							$scope.promise = $http.post($scope.services + '/odontrograma/porposicion', {
+								"accion": "desc"
+								, "imagen": "5"
+								, "idpacienteodontograma": $scope.pacienteodontogramadiagnosticos.idpacienteodontograma
+								, "idpaciente": $scope.paciente.idpaciente
+							}).then(function(response) {
+								if (response.data.estado == 1) {
+									$scope.superiorDerechob = response.data.aaData;
+									generaimgsdb();
+								} else {
+									toaster.pop("error", "", "No es posible retornar el odontongrama", 800, 'trustedHtml');
+								}
+							}, function(x) {
+								toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+							});
+							break
+						case 6:
+							$scope.superiorIzquierdob = [];
+							$scope.promise = $http.post($scope.services + '/odontrograma/porposicion', {
+								"accion": "asc"
+								, "imagen": "6"
+								, "idpacienteodontograma": $scope.pacienteodontogramadiagnosticos.idpacienteodontograma
+								, "idpaciente": $scope.paciente.idpaciente
+							}).then(function(response) {
+								if (response.data.estado == 1) {
+									$scope.superiorIzquierdob = response.data.aaData;
+									generaimgsib();
+								} else {
+									toaster.pop("error", "", "No es posible retornar el odontongrama", 800, 'trustedHtml');
+								}
+							}, function(x) {
+								toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+							});
+							break
+						case 7:
+							$scope.inferiorIzquierdob = [];
+							$scope.promise = $http.post($scope.services + '/odontrograma/porposicion', {
+								"accion": "asc"
+								, "imagen": "7"
+								, "idpacienteodontograma": $scope.pacienteodontogramadiagnosticos.idpacienteodontograma
+								, "idpaciente": $scope.paciente.idpaciente
+							}).then(function(response) {
+								if (response.data.estado == 1) {
+									$scope.inferiorIzquierdob = response.data.aaData;
+									generaimgiib();
+								} else {
+									toaster.pop("error", "", "No es posible retornar el odontongrama", 800, 'trustedHtml');
+								}
+							}, function(x) {
+								toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+							});
+							break
+						case 8	:
+							$scope.inferiorDerechob = [];
+							$scope.promise = $http.post($scope.services + '/odontrograma/porposicion', {
+								"accion": "desc"
+								, "imagen": "8"
+								, "idpacienteodontograma": $scope.pacienteodontogramadiagnosticos.idpacienteodontograma
+								, "idpaciente": $scope.paciente.idpaciente
+							}).then(function(response) {
+								if (response.data.estado == 1) {
+									$scope.inferiorDerechob = response.data.aaData;
+									generaimgidb();
+								} else {
+									toaster.pop("error", "", "No es posible retornar el odontongrama", 800, 'trustedHtml');
+								}
+							}, function(x) {
+								toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+							});
+						default:
+					}
+				} else {}
+				$scope.objinserto = response.data.defaultObj;
+			}, function(x) {
+				toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+			});
+		} else {
+			toaster.pop("Warning", "", "Por favor seleccione el diagnostico", 800, 'trustedHtml');
+		}
+	}
+	$scope.crud = function(val, mail) {
+		if ($scope.paciente.estado == true) {
+			$scope.paciente.estado = 1;
+		} else {
+			$scope.paciente.estado = 0;
+		}
+		if (val == 1) {
+			$scope.paciente.accion = '';
+		} else {
+			$scope.paciente = mail;
+			$scope.paciente.accion = "D";
+		};
+		var modalConfirm = $modal.open({
+			templateUrl: 'myModalContentConfirma.html'
+			, controller: 'modalctlConfirma'
+			, 
+			size:'sm',
+			backdrop: 'static', keyboard: false,
+			resolve: {
+				item: function() {
+					return $scope.paciente.idpaciente > 0 ? $scope.paciente.idpaciente : 0;
+				}
+				, estado: function() {
+					return val;
+				}
+				, nombre: function() {
+					return $scope.paciente.nombre;
+				}
+			}
+		});
+		modalConfirm.result.then(function() {
+			$scope.paciente.fechanacimiento=new Date($scope.paciente.fechanacimiento);
+			return $scope.promise = $http.post($scope.services + '/paciente/inserta', $scope.paciente).then(function(response) {
+				if (response.data.estado == 1) {
+					
+					$scope.seleccionapaciente(response.data.defaultObj.idpaciente);
+					toaster.pop("success", "", response.data.msg, 800, 'trustedHtml');
+				} else if (response.data.estado == 0) {
+					toaster.pop("success", "", response.data.msg, 800, 'trustedHtml');
+				} else if (response.data.estado == 2) {
+					toaster.pop("info", "", response.data.msg, 800, 'trustedHtml');
+				} else if (response.data.estado == 3) {
+					toaster.pop("error", "", response.data.msg, 800, 'trustedHtml');
+				} else {
+					toaster.pop("error", "", "Error inesperado en el cliente", 800, 'trustedHtml');
+				}
+				$scope.tableParamsPaciente.reload();
+			}, function(x) {
+				toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+			});
+			
+			
+			
+		}, function() {});
+	};
+	$scope.filtros = function(a) {
+		if (a == 0) {
+			$scope.accion = 0;
+			$scope.tableParamsPaciente.reload();
+		} else if (a == 1) {
+			$scope.visibles();
+		} else {
+			$scope.novisibles();
+		}
+	}
+	$scope.pacienteanamnesis = {"accion":"0"};
+	$scope.tra=false;
+	
+	$scope.pag=[];
+	
+	$scope.crudtotal = function() {debugger
+		$scope.con.accion = "1";
+		$scope.con.valor = 0;
+		if($scope.con.valor == 0){
+			$scope.crudAnamnesis();
+			$scope.con.valor = 1;
+		}else if($scope.con.valor == 1){
+			$scope.crudAntecedente();
+			$scope.con.valor = 2;
+		}else if($scope.con.valor == 2){
+			$scope.crudExploracionFisica();
+			$scope.con.valor = 3;
+		}else if($scope.con.valor == 3){
+			$scope.con.accion = "0";
+		}
+			$scope.con.accion = "0";
+	};
+	$scope.crudAnamnesis = function(val, mail) {
+			$scope.anamnesis.accion = "0";
+			$scope.anamnesis.idpaciente = $scope.paciente.idpaciente;
+			
+			return $scope.promise = $http.post($scope.services + '/anamnesis/inserta', $scope.anamnesis)
+			.then(function(response) {
+				if (response.data.estado == 1) {
+					if (response.data.defaultObj != null) {
+						$scope.anamnesis.idanamnesis = response.data.defaultObj.idanamnesis;
+					}
+					if( $scope.con.accion == "0" || $scope.con.accion == "1" ){
+						if ($scope.con.accion == "1") {$scope.con.accion ="2";}
+					}
+					toaster.pop("success", "", "Anamnesis actualizada correctamente.", 10000, 'trustedHtml');
+				} else if (response.data.estado == 0) {
+					toaster.pop("success", "", response.data.msg, 10000, 'trustedHtml');
+				} else if (response.data.estado == 2) {
+					toaster.pop("info", "", response.data.msg, 10000, 'trustedHtml');
+				} else if (response.data.estado == 3) {
+					toaster.pop("error", "", response.data.msg, 10000, 'trustedHtml');
+				} else {
+					toaster.pop("error", "", "Error inesperado en el cliente", 10000, 'trustedHtml');
+				}
+			}, function(x) {
+				toaster.pop("error", "", "No es posible conectarse con el servicio web", 10000, 'trustedHtml');
+			});
+	};
+	$scope.crudExploracionFisica = function(val, mail) {
+			$scope.exploracionfisica.accion = "0";
+			$scope.anamnesis.accion = "0";
+			$scope.anamnesis.idpaciente = $scope.paciente.idpaciente;
+			$scope.exploracionfisica.idanamnesis = $scope.anamnesis.idanamnesis;
+			$scope.anamnesis.exploracionfisica=$scope.exploracionfisica;
+			
+			if($scope.exploracionfisica.idanamnesis != null && $scope.exploracionfisica.idanamnesis > 0 ){
+				return $scope.promise = $http.post($scope.services + '/exploracionfisica/inserta', $scope.exploracionfisica)
+				.then(function(response) {debugger
+					if (response.data.estado == 1) {
+						if (response.data.defaultObj != null) {
+							$scope.exploracionfisica.idexploracion = response.data.defaultObj.idexploracion;
+						}
+						if(  $scope.con.accion == "0" || $scope.con.accion == "1" ){
+							toaster.pop("success", "", "Eploración Física actualizada correctamente.", 10000, 'trustedHtml');
+							if ($scope.con.accion == "1") {$scope.con.accion ="2";}
+						}
+					} else if (response.data.estado == 0) {
+						toaster.pop("success", "", response.data.msg, 10000, 'trustedHtml');
+					} else if (response.data.estado == 2) {
+						toaster.pop("info", "", response.data.msg, 10000, 'trustedHtml');
+					} else if (response.data.estado == 3) {
+						toaster.pop("error", "", response.data.msg, 10000, 'trustedHtml');
+					} else {
+						toaster.pop("error", "", "Error inesperado en el cliente", 10000, 'trustedHtml');
+					}
+				}, function(x) {
+					toaster.pop("error", "", "No es posible conectarse con el servicio web", 10000, 'trustedHtml');
+				});
+			}else{
+				return $scope.promise = $http.post($scope.services + '/anamnesis/inserta', $scope.anamnesis)
+				.then(function(response) {debugger
+					if (response.data.estado == 1) {
+						$scope.anamnesis.idanamnesis = response.data.defaultObj.idanamnesis;
+					 	$scope.exploracionfisica = response.data.defaultObj.exploracionfisica;
+					 	if( $scope.con.accion == "0" || $scope.con.accion == "1"){
+							toaster.pop("success", "", "Antecedente actualizado correctamente.", 10000, 'trustedHtml');
+							if ($scope.con.accion == "1"){
+								$scope.con.accion ="2";
+							}
+						}
+					} else if (response.data.estado == 0) {
+						toaster.pop("success", "", response.data.msg, 10000, 'trustedHtml');
+					} else if (response.data.estado == 2) {
+						toaster.pop("info", "", response.data.msg, 10000, 'trustedHtml');
+					} else if (response.data.estado == 3) {
+						toaster.pop("error", "", response.data.msg, 10000, 'trustedHtml');
+					} else {
+						toaster.pop("error", "", "Error inesperado en el cliente", 10000, 'trustedHtml');
+					}
+				}, function(x) {
+					toaster.pop("error", "", "No es posible conectarse con el servicio web", 10000, 'trustedHtml');
+				});
+			};
+	};
+	$scope.crudAntecedente = function(val, mail) {
+			var detalleantecedente = $scope.detalleantecedente;
+			var long = detalleantecedente.length;	
+			for(var i=0; i < $scope.lsarrays.length;i++){
+				for(var j=0; j < $scope.lsarrays[i].length;j++){
+					var obs = {};
+					for(var k=0; k<long;k++){
+						if($scope.lsarrays[i][j].idenfermedad == detalleantecedente[k].idenfermedad){
+							if(detalleantecedente[k].observacion != $scope.lsarrays[i][j].observacion){
+								detalleantecedente[k].observacion = $scope.lsarrays[i][j].observacion;
+							}
+							obs = {};
+							break;
+						}else if($scope.lsarrays[i][j].observacion != null){
+							obs.idantecedente = $scope.antecedente.idantecedente;
+							obs.idenfermedad = $scope.lsarrays[i][j].idenfermedad;
+							obs.observacion = $scope.lsarrays[i][j].observacion;
+						}
+					}
+					if(long==0 && $scope.lsarrays[i][j].observacion != null){
+						obs.idenfermedad = $scope.lsarrays[i][j].idenfermedad;
+						obs.observacion = $scope.lsarrays[i][j].observacion;
+					}
+					if(JSON.stringify(obs)!='{}'){
+						detalleantecedente.push(obs);
+					}
+				}
+			}
+			$scope.antecedente.lsdetalle=detalleantecedente;
+			$scope.anamnesis.antecedente=$scope.antecedente;
+			$scope.antecedente.accion = "0";
+			$scope.anamnesis.accion = "0";
+			$scope.anamnesis.idpaciente = $scope.paciente.idpaciente;
+			$scope.antecedente.idanamnesis = $scope.anamnesis.idanamnesis;
+			
+			if($scope.antecedente.idanamnesis != null && $scope.antecedente.idanamnesis > 0 ){
+				return $scope.promise = $http.post($scope.services + '/antecedente/inserta', $scope.antecedente)
+				.then(function(response) {debugger
+					if (response.data.estado == 1) {
+						if (response.data.defaultObj != null) {
+							$scope.antecedente = response.data.defaultObj.antecedente;
+						}
+						if( $scope.con.accion == "0" || $scope.con.accion == "1"){
+							toaster.pop("success", "", "Antecedente actualizado correctamente.", 10000, 'trustedHtml');
+							if ($scope.con.accion == "1") {
+							$scope.con.accion ="2";}
+						}
+					} else if (response.data.estado == 0) {
+						toaster.pop("success", "", response.data.msg, 10000, 'trustedHtml');
+					} else if (response.data.estado == 2) {
+						toaster.pop("info", "", response.data.msg, 10000, 'trustedHtml');
+					} else if (response.data.estado == 3) {
+						toaster.pop("error", "", response.data.msg, 10000, 'trustedHtml');
+					} else {
+						toaster.pop("error", "", "Error inesperado en el cliente", 10000, 'trustedHtml');
+					}
+				}, function(x) {
+					toaster.pop("error", "", "No es posible conectarse con el servicio web", 10000, 'trustedHtml');
+				});
+			}else{
+				return $scope.promise = $http.post($scope.services + '/anamnesis/inserta', $scope.anamnesis)
+				.then(function(response) {
+					if (response.data.estado == 1) {
+						$scope.anamnesis.idanamnesis = response.data.defaultObj.idanamnesis;
+					 	$scope.antecedente = response.data.defaultObj.antecedente;
+					 	if( $scope.con.accion == "0" || $scope.con.accion == "1" ){
+							toaster.pop("success", "", "Antecedente actualizado correctamente.", 10000, 'trustedHtml');
+							if ($scope.con.accion == "1") {$scope.con.accion = "2";}
+						}
+					} else if (response.data.estado == 0) {
+						toaster.pop("success", "", response.data.msg, 10000, 'trustedHtml');
+					} else if (response.data.estado == 2) {
+						toaster.pop("info", "", response.data.msg, 10000, 'trustedHtml');
+					} else if (response.data.estado == 3) {
+						toaster.pop("error", "", response.data.msg, 10000, 'trustedHtml');
+					} else {
+						toaster.pop("error", "", "Error inesperado en el cliente", 10000, 'trustedHtml');
+					}
+				}, function(x) {
+					toaster.pop("error", "", "No es posible conectarse con el servicio web", 10000, 'trustedHtml');
+				});
+			};
+	};
+	
+	function listarpag(total, cantidad) { 
+		$scope.accion=4;
+		return $scope.promise = $http.post($scope.services + '/documentos/list',{
+			"idpaciente":$scope.paciente.idpaciente,
+			"idclinica":$scope.app.settings.selectedClinica,
+			"iddoctor":CurrentUser,
+			"accion":$scope.accion,
+			"estado":$scope.accion,
+			}).then(function(response) {  
+			if (response.data.estado == 1) {
+				$scope.listapresu=response.data;
+				$scope.tra=false;
+				$scope.pag=response.data.aaData;
+				calcularmontos();
+				
+				return response.data;				
+			}else{$scope.tra=true;}
+		}, function(x) {
+			toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+		});
+	};
+	$scope.docu=[];
+	$scope.lsdetinsu=[];
+		function listardoc(total, cantidad) { 
+		$scope.accion=1;
+		return $scope.promise = $http.post($scope.services + '/documentos/list',{
+			"idpaciente":$scope.paciente.idpaciente,
+			"idclinica":$scope.app.settings.selectedClinica,
+			"iddoctor":CurrentUser,
+			"accion":$scope.accion,
+			"estado":$scope.accion,
+			}).then(function(response) {     
+			if (response.data.estado == 1) {
+				$scope.tra=false;		
+				$scope.docu=response.data.aaData;	
+				return response.data;				
+			}else{$scope.tra=true;}
+		}, function(x) {
+			toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+		});
+	};
+	
+	
+	$scope.tableParamsTratamiento = new ngTableParams({
+		page:1,
+		count:$scope.cantidadderegistrosporpagina,
+		sorting:{
+			name:'asc'
+		}
+	},{
+		getData: function($defer, params) {
+			if ($scope.accion == -1) {} else {
+				if (params.page() == 1) { 
+					listardoc((params.page() * params.count()) - params.count(), params.count()).then(function(data) { 
+						$scope.insumo();
+						var filteredData = params.filter() ? $filter('filter')(data.aaData, params.filter()) : data.aaData;
+						var orderedData = params.sorting() ? $filter('orderBy')(filteredData, params.orderBy()) : filteredData;
+						$scope.obj = orderedData.slice(
+							(params.page() - 1) * params.count(), params.page() * params.count());
+						params.total(data.cantidad);
+						$defer.resolve($scope.obj);
+					});
+				} else {
+					listardoc((params.page() * params.count()) - params.count(), params.count()).then(function(datac) {
+						$defer.resolve(datac.aaData);
+					});
+				}
+			}
+		}
+	}, function(error) {
+	});
+
+	$scope.tableParamsPresupuesto = new ngTableParams({
+		page:1,
+		count:$scope.cantidadderegistrosporpagina,
+		sorting:{
+			name:'asc'
+		}
+	},{
+		getData: function($defer, params) {
+			if ($scope.accion == -1) {} else {
+				if (params.page() == 1) {
+					listardoc((params.page() * params.count()) - params.count(), params.count()).then(function(data) {
+						
+						var filteredData = params.filter() ? $filter('filter')(data.aaData, params.filter()) : data.aaData;
+						var orderedData = params.sorting() ? $filter('orderBy')(filteredData, params.orderBy()) : filteredData;
+						$scope.obj = orderedData.slice(
+							(params.page() - 1) * params.count(), params.page() * params.count());
+						params.total(data.cantidad);
+						$defer.resolve($scope.obj);
+					});
+				} else {
+					listardoc((params.page() * params.count()) - params.count(), params.count()).then(function(datac) {
+						$defer.resolve(datac.aaData);
+					});
+				}
+			}
+		}
+	}, function(error) {
+	});
+	
+	$scope.tableParamsPagos = new ngTableParams({
+		page:1,
+		count:$scope.cantidadderegistrosporpagina,
+		sorting:{
+			name:'asc'
+		}
+	},{
+		getData: function($defer, params) {
+			if ($scope.accion == -1) {} else {
+				if (params.page() == 1) {
+					listarpag((params.page() * params.count()) - params.count(), params.count()).then(function(data) {
+						var filteredData = params.filter() ? $filter('filter')(data.aaData, params.filter()) : data.aaData;
+						var orderedData = params.sorting() ? $filter('orderBy')(filteredData, params.orderBy()) : filteredData;
+						$scope.obj = orderedData.slice(
+							(params.page() - 1) * params.count(), params.page() * params.count());
+						params.total(data.cantidad);
+						$defer.resolve($scope.obj);
+					});
+				} else {
+					listarpag((params.page() * params.count()) - params.count(), params.count()).then(function(datac) {
+						$defer.resolve(datac.aaData);
+					});
+				}
+			}
+		}
+	}, function(error) {
+	});
+	
+	$scope.aprobar=function(size,idval,docu){
+	
+	$scope.promise = $http.post($scope.services + '/documentos/finid', 
+			{"iddocumentos": docu,
+			"idclinica":$scope.app.settings.selectedClinica}).
+			then(function(response) {
+			if (response.data.estado == 1) {
+				$scope.documentofil=response.data.defaultObj;
+				var modalPaciente = $modal.open({
+					templateUrl: 'modalPresupuestoApro.html'
+					, controller: 'modalAproController'
+					, size: 'lg'
+					,backdrop: 'static', keyboard: false, 
+					resolve: {
+						service: function() {
+							return $scope.services;
+						}
+						, idval: function() {
+							return idval;
+						}
+						, selectedClinica: function() {
+							return $scope.app.settings.selectedClinica;
+						}
+						, docum: function() {
+							return $scope.documentofil;
+						}
+					}
+				});
+				modalPaciente.result.then(function(selectedItem) {
+					$scope.tableParamsPaciente.reload();
+					$scope.tableParamsPresupuesto.reload();
+					$scope.tableParamsPagos.reload();
+				}, function() {});
+			}
+		}, function(x) {
+			toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+		});
+		
+		
+	}
+
+function calcularmontos(){
+	$scope.tpre=0;
+	$scope.tabo=0;
+	$scope.tpaf=0;
+		 for(var j=0;j<$scope.pag.length;j++){ //lo que se ha abonado
+			 var totalpago=0;
+			 if($scope.pag[j].lspago.length != 0){
+				 for(var i=0;i<$scope.pag[j].lspago.length;i++){
+					 totalpago=totalpago + $scope.pag[j].lspago[i].montocancelado;
+		 			}
+				 $scope.docu[j].totalpago=totalpago;
+				 $scope.pag[j].totalpago=totalpago;
+			 }else{
+				 $scope.docu[j].totalpago=totalpago;
+				 $scope.pag[j].totalpago=totalpago;
+			 }
+			 $scope.docu[j].totalfin=$scope.docu[j].total-$scope.docu[j].totalpago;
+			 $scope.pag[j].totalfin=$scope.pag[j].total-$scope.pag[j].totalpago;
+		 }		 
+	for(var j=0;j<$scope.pag.length;j++){
+		
+		$scope.tpre=$scope.tpre+$scope.pag[j].total;
+		$scope.tabo=$scope.tabo+$scope.pag[j].totalpago;
+		$scope.tpaf=$scope.tpaf+$scope.pag[j].totalfin;
+		for(var i=0;i<$scope.pag[j].lsdetalle.length;i++){
+		$scope.pag[j].lsdetalle[i].des=($scope.pag[j].lsdetalle[i].servicio.precio*$scope.pag[j].lsdetalle[i].descuentodet)/100;
+		$scope.pag[j].lsdetalle[i].totdes=$scope.pag[j].lsdetalle[i].servicio.precio-$scope.pag[j].lsdetalle[i].des;
+		
+		}
+	}
+	 for(var j=0;j<$scope.docu.length;j++){
+		 var totalpago=0;
+		 if($scope.docu[j].estado != 1){
+			 for(var i=0;i<$scope.docu[j].lspago.length;i++){
+				 totalpago=totalpago + $scope.docu[j].lspago[i].montocancelado;
+	 			}
+			 $scope.docu[j].totalpago=totalpago;
+		 }else{
+			 $scope.docu[j].totalpago=totalpago;
+		 }
+		 if($scope.docu[j].estado==3){
+		 $scope.docu[j].totalfin=$scope.docu[j].total-$scope.docu[j].totalpago;
+		 }else{
+			 $scope.docu[j].totaltotal=0;
+			 $scope.docu[j].totalfin=0;
+		 }
+	 }		 
+/*for(var j=0;j<$scope.pag.length;j++){
+
+	for(var i=0;i<$scope.docu[j].lsdetalle.length;i++){
+		$scope.docu[j].lsdetalle[i].totdes=$scope.docu[j].lsdetalle[i].servicio.precio-$scope.docu[j].lsdetalle[i].descuentodet;
+	
+	}
+}*/
+	};
+	
+	$scope.insumo=function(){
+		$scope.lsdetinsu=[];
+	for(var a=0;a<$scope.docu.length;a++){
+		for(var b=0;b<$scope.docu[a].lsdetalle.length;b++){
+			for(var c=0;c<$scope.docu[a].lsdetalle[b].servicio.lsdetalle.length;c++){
+				$scope.lsdetinsu.push($scope.docu[a].lsdetalle[b].servicio.lsdetalle[c]);
+			}
+		}
+	}
+	var lsdetinsumo=[];
+	var obj={};
+	var x=0;
+	var c=0;
+	
+	for(var d=0;d<$scope.lsdetinsu.length;d++){  
+		x=$scope.lsdetinsu[d].idinsumo;	
+	var repe = false;
+		c=0;
+		for(var e=0;e<$scope.lsdetinsu.length;e++){
+			if($scope.lsdetinsu[e].idinsumo==x){
+				obj.idinsumo=$scope.lsdetinsu[e].idinsumo;
+				obj.descripcion=$scope.lsdetinsu[e].insumo.descripcion;
+				obj.unidad=$scope.lsdetinsu[e].insumo.unidad;
+				c=c+$scope.lsdetinsu[e].cantidad;
+				obj.cantidad=c;
+			}
+		}
+		if(lsdetinsumo.length==0){
+		lsdetinsumo.push(obj);
+		}else{
+			for(var f=0;f<lsdetinsumo.length;f++){
+				if(lsdetinsumo[f].idinsumo == obj.idinsumo){
+					var repe= true;
+					f=lsdetinsumo.length;
+				}else{					
+				}				
+			}
+			if(!repe){
+				lsdetinsumo.push(obj);
+			}
+		}
+		obj={};
+		}	
+	$scope.lsdetinsu=lsdetinsumo;
+	}
+	
+	$scope.pago=function(size,mail,pago){
+		
+		var modalConfirm =$modal.open({
+			templateUrl: 'modalPagos.html',
+			controller: 'modalpagos',
+			backdrop: 'static', keyboard: false,
+			resolve:{
+				paciente:function(){
+					return pago
+				},idval:function(){
+					return mail
+				},selectedClinica:function(){
+					return $scope.app.settings.selectedClinica
+				},
+				service:function(){
+					return $scope.services
+				}				
+				
+			}
+		});modalConfirm.result.then(function() {
+			$scope.tableParamsPagos.reload();
+			$scope.tableParamsPresupuesto.reload();
+			calcularmontos();
+		}, function() {});
+	};
+	
+	$scope.elimina=function(pag){
+		var modalConfirm = $modal.open({
+			templateUrl: 'myModalContentConfirma.html'
+			, controller: 'modalctlConfirma'
+			,backdrop: 'static', keyboard: false,
+			resolve: {
+				item: function() {
+					return 0;
+				}
+				, estado: function() {
+					return '';
+				}
+				, nombre: function() {
+					return "";
+				}
+			}
+		});
+		modalConfirm.result.then(function() {
+			var pago=pag;
+			pago.estado=1;
+			pago.accion='D';
+			return $scope.promise = $http.post($scope.services + '/pago/inserta', pago).then(function(response) {
+				if (response.data.estado == 1) {
+					toaster.pop("success", "", response.data.msg, 800, 'trustedHtml');
+					
+				} else if (response.data.estado == 0) {
+					toaster.pop("success", "", response.data.msg, 800, 'trustedHtml');
+				} else if (response.data.estado == 2) {
+					toaster.pop("info", "", response.data.msg, 800, 'trustedHtml');
+				} else if (response.data.estado == 3) {
+					toaster.pop("error", "", response.data.msg, 800, 'trustedHtml');
+				} else {
+					toaster.pop("error", "", "Error inesperado en el cliente", 800, 'trustedHtml');
+				}
+				$scope.tableParamsPagos.reload();
+				$scope.tableParamsPresupuesto.reload();
+			}, function(x) {
+				toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+			});
+		}, function() {});
+	}
+	$scope.crudAmnesis = function(val, mail) {
+		var modalConfirm = $modal.open({
+			templateUrl: 'myModalContentConfirma.html'
+			, controller: 'modalctlConfirma'
+			, 
+			size:'sm',
+			backdrop: 'static', keyboard: false,
+			resolve: {
+				item: function() {
+					return 0;
+				}
+				, estado: function() {
+					return val;
+				}
+				, nombre: function() {
+					return "";
+				}
+			}
+		});
+		modalConfirm.result.then(function() {
+			$scope.pacienteanamnesis.accion = "0";
+			$scope.pacienteanamnesis.idpaciente = $scope.paciente.idpaciente;
+			return $scope.promise = $http.post($scope.services + '/pacienteanamnesis/inserta', $scope.pacienteanamnesis).then(function(response) {
+				if (response.data.estado == 1) {
+					toaster.pop("success", "", response.data.msg, 800, 'trustedHtml');
+				} else if (response.data.estado == 0) {
+					toaster.pop("success", "", response.data.msg, 800, 'trustedHtml');
+				} else if (response.data.estado == 2) {
+					toaster.pop("info", "", response.data.msg, 800, 'trustedHtml');
+				} else if (response.data.estado == 3) {
+					toaster.pop("error", "", response.data.msg, 800, 'trustedHtml');
+				} else {
+					toaster.pop("error", "", "Error inesperado en el cliente", 800, 'trustedHtml');
+				}
+				$scope.tableParamsPacienteanamnesis.reload();
+			}, function(x) {
+				toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+			});
+		}, function() {});
+	};
+	 var numeros=["0","1","2","3","4","5","6","7","8","9"]
+	    $scope.validarnombre=function(e){
+	    	var key=e;
+	    	var tmp=key.substring(0,(key.length-1));
+	    	if(key.length>0 && key!=''){
+	    		for(var i=0;i<numeros.length;i++){
+	    			if(key[key.length-1]==numeros[i]){
+	    				toaster.pop("error", "", "Caracter invalido. Favor ingrese solo letras.", 800, 'trustedHtml');
+	    				$scope.paciente.nombre=tmp;
+	    				i=i+numeros.length;
+	    				}
+	    		}
+	    	}
+	    }
+	 $scope.validarapepat=function(e){
+	    	var key=e;
+	    	var tmp=key.substring(0,(key.length-1));
+	    	if(key.length>0 && key!=''){
+	    		for(var i=0;i<numeros.length;i++){
+	    			if(key[key.length-1]==numeros[i]){
+	    				toaster.pop("error", "", "Caracter invalido. Favor ingrese solo letras.", 800, 'trustedHtml');
+	    				$scope.paciente.apepat=tmp;
+	    				i=i+numeros.length;
+	    				}
+	    		}
+	    	}
+	    }
+	 $scope.validarapemat=function(e){
+	    	var key=e;
+	    	var tmp=key.substring(0,(key.length-1));
+	    	if(key.length>0 && key!=''){
+	    		for(var i=0;i<numeros.length;i++){
+	    			if(key[key.length-1]==numeros[i]){
+	    				toaster.pop("error", "", "Caracter invalido. Favor ingrese solo letras.", 800, 'trustedHtml');
+	    				$scope.paciente.apemat=tmp;
+	    				i=i+numeros.length;
+	    				}
+	    		}
+	    	}
+	    }
+	 $scope.validaredad=function(e){
+	    	var key=e;
+	    	var cval=false;
+	    	if(key>=0){ 				
+	    		cval=true;
+			}else{
+				cval=false;	    				
+			}
+	    	if(!cval){
+				toaster.pop("error", "", "Edad invalida.", 800, 'trustedHtml');
+				$scope.paciente.edad='';
+			}
+	    }
+	    $scope.validartlf=function(e){
+	    	var key=e;
+	    	var cval=false;
+	    	var tmp=key.substring(0,(key.length-1));
+	    	if(key.length>0 && key!=''){
+	    		for(var i=0;i<numeros.length;i++){
+	    			if(key[key.length-1]==numeros[i]){ 				
+	    				cval=true;
+	    				i=i+numeros.length;
+	    				}else{
+	    					cval=false;	    				
+	    				}
+	    			}
+	    		if(!cval){
+	    			toaster.pop("error", "", "Caracter invalido. Favor ingrese solo números.", 800, 'trustedHtml');
+					$scope.paciente.telefono=tmp;
+	    		}
+	    	}
+	    }
+	    $scope.validarcel=function(e){
+	    	var key=e;
+	    	var cval=false;
+	    	var tmp=key.substring(0,(key.length-1));
+	    	if(key.length>0 && key!=''){
+	    		for(var i=0;i<numeros.length;i++){
+	    			if(key[key.length-1]==numeros[i]){ 				
+	    				cval=true;
+	    				i=i+numeros.length;
+	    				}else{
+	    					cval=false;	    				
+	    				}
+	    			}
+	    		if(!cval){
+	    			toaster.pop("error", "", "Caracter invalido. Favor ingrese solo números.", 800, 'trustedHtml');
+					$scope.paciente.celular=tmp;
+	    		}
+	    	}
+	    }
+	    $scope.validarfechanac=function(e){
+	    	var fechahoy = new Date();
+			var cval=false;
+			if(e <= fechahoy){
+				cval=true;
+			}else{
+				cval=false;
+			}
+			if(!cval){
+				toaster.pop("error", "", "Fecha invalida.", 800, 'trustedHtml');
+				$scope.paciente.fechanacimiento='';
+			}
+	    }
+	    
+	    $scope.diagnos={};
+	    
+		$scope.savediagno=function(){
+				if($scope.lssubdiagno.length>0){
+				$scope.lssubdiagno[$scope.lssubdiagno.length-1].bloq=true;
+				$scope.lssubdiagno[$scope.lssubdiagno.length-1].bloql=true;
+				var ob={"idservicio":0};
+				lsserv.push(ob);
+				lsserv[p].idservicio=idsertmp;
+				lsserv[p].bloqueo=true;
+				$scope.lssubdiagno[$scope.lssubdiagno.length-1].lsdetalle=lsserv;
+				$scope.lssubdiagno[$scope.lssubdiagno.length-lsserv.length].bloqn=true;
+				lsserv=[];
+			}
+			var lsditmp=[];
+			var c=0;
+			for(var e=0;e<$scope.lssubdiagno.length;e++){
+				if($scope.lssubdiagno[e].descripcion == undefined){
+					c=c+1;
+					if($scope.lssubdiagno[e].lsdetalle!=undefined){
+						lsditmp[e-c].lsdetalle=$scope.lssubdiagno[e].lsdetalle;
+					}
+				}else{
+					lsditmp.push($scope.lssubdiagno[e])
+				}
+			}
+			
+			var dd={
+					"idpaciente":$scope.paciente.idpaciente,
+					"pronostico":$scope.diagnos.pronostico,
+					"accion":'',
+					"lssubdiag":lsditmp
+				}
+			
+			$http.post($scope.services + '/diagdef/inserta',dd).then(function(response) {
+				toaster.pop("success", "", "El diagnostico se inserto correctamente", 800, 'trustedHtml');		
+			}, function(x) {
+				toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+			});	
+		}
+	    
+	    
+	    
+}]);
+app.controller('modalPacienteController', ['$rootScope','paciente','idval', 'selectedClinica', 'service', '$modalInstance', '$scope', '$http', '$modal', '$state', 'ngTableParams', '$q', '$filter', 'toaster', function($rootScope,paciente,idval, selectedClinica, service, $modalInstance, $scope, $http, $modal, $state, ngTableParams, $q, $filter, toaster) {
+	
+	$scope.docid=$rootScope.globals.currentUser.iddoctor.iddoctor;
+	$scope.doctor={
+			"iddoctor":$scope.docid
+	};
+	$scope.accion = 1;
+	 
+	$scope.visible = false;
+	$scope.accion = 1;
+	$scope.paciente={
+			"estado":true
+	};
+	$scope.lsServicio=[];
+	$scope.lsDoctor=[];
+	$scope.lsServicio=[];
+ 	$scope.documento={};
+	
+	$scope.tratamiento={
+			"precio":0,
+			"duracion":0,
+			"idtratamiento":0
+	};
+	$scope.detalle={
+    		"numero":1
+    };
+	  $scope.lsDetalle=[];
+    var count=1;
+    $scope.duracsuma = 0;
+    $scope.duracisuma= function(){  
+    	 $scope.duracsuma = 0;
+    	for(var i=0;i < $scope.lsDetalle.length; i++){
+    		$scope.duracsuma = $scope.duracsuma + $scope.lsDetalle[i].tiempoduracion;
+    	}
+    	
+    }
+    
+    var numeros=["0","1","2","3","4","5","6","7","8","9"]
+    $scope.validarnom=function(e){
+    	var key=e;
+    	var tmp=key.substring(0,(key.length-1));
+    	if(key.length>0 && key!=''){
+    		for(var i=0;i<numeros.length;i++){
+    			if(key[key.length-1]==numeros[i]){
+    				toaster.pop("error", "", "Caracter invalido. Favor ingrese solo letras.", 800, 'trustedHtml');
+    				$scope.paciente.nombre=tmp;
+    				i=i+numeros.length;
+    				}
+    		}
+    	}
+    }
+    $scope.validarapepat=function(e){
+    	var key=e;
+    	var tmp=key.substring(0,(key.length-1));
+    	if(key.length>0 && key!=''){
+    		for(var i=0;i<numeros.length;i++){
+    			if(key[key.length-1]==numeros[i]){
+    				toaster.pop("error", "", "Caracter invalido. Favor ingrese solo letras.", 800, 'trustedHtml');
+    				$scope.paciente.apepat=tmp;
+    				i=i+numeros.length;
+    				}
+    		}
+    	}
+    }
+    $scope.validarapemat=function(e){
+    	var key=e;
+    	var tmp=key.substring(0,(key.length-1));
+    	if(key.length>0 && key!=''){
+    		for(var i=0;i<numeros.length;i++){
+    			if(key[key.length-1]==numeros[i]){
+    				toaster.pop("error", "", "Caracter invalido. Favor ingrese solo letras.", 800, 'trustedHtml');
+    				$scope.paciente.apemat=tmp;
+    				i=i+numeros.length;
+    				}
+    		}
+    	}
+    }
+    $scope.validardni=function(e){
+    	var key=e;
+    	var cval=false;
+    	var tmp=key.substring(0,(key.length-1));
+    	if(key.length>0 && key!=''){
+    		for(var i=0;i<numeros.length;i++){
+    			if(key[key.length-1]==numeros[i]){ 				
+    				cval=true;
+    				i=i+numeros.length;
+    				}else{
+    					cval=false;	    				
+    				}
+    			}
+    		if(!cval){
+    			toaster.pop("error", "", "Caracter invalido. Favor ingrese solo números.", 800, 'trustedHtml');
+				$scope.paciente.documentoidentidad=tmp;
+    		}
+    	}
+    }
+    $scope.validaredad=function(e){
+    	var key=e;
+    	var cval=false;
+    	if(key>=0){ 				
+    		cval=true;
+		}else{
+			cval=false;	    				
+		}
+    	if(!cval){
+			toaster.pop("error", "", "Edad invalida.", 800, 'trustedHtml');
+			$scope.paciente.edad='';
+		}
+    }
+    $scope.validartelefono=function(e){
+    	var key=e;
+    	var cval=false;
+    	var tmp=key.substring(0,(key.length-1));
+    	if(key.length>0 && key!=''){
+    		for(var i=0;i<numeros.length;i++){
+    			if(key[key.length-1]==numeros[i]){ 				
+    				cval=true;
+    				i=i+numeros.length;
+    				}else{
+    					cval=false;	    				
+    				}
+    			}
+    		if(!cval){
+    			toaster.pop("error", "", "Caracter invalido. Favor ingrese solo números.", 800, 'trustedHtml');
+				$scope.paciente.telefono=tmp;
+    		}
+    	}
+    }
+    $scope.validarcelular=function(e){ 
+    	var key=e;
+    	var cval=false;
+    	var tmp=key.substring(0,(key.length-1));
+    	if(key.length>0 && key!=''){
+    		for(var i=0;i<numeros.length;i++){
+    			if(key[key.length-1]==numeros[i]){ 				
+    				cval=true;
+    				i=i+numeros.length;
+    				}else{
+    					cval=false;	    				
+    				}
+    			}
+    		if(!cval){
+    			toaster.pop("error", "", "Caracter invalido. Favor ingrese solo números.", 800, 'trustedHtml');
+				$scope.paciente.celular=tmp;
+    		}
+    	}
+    }
+    $scope.validarfechanac=function(e){ 
+    	var fechahoy = new Date();
+		var cval=false;
+		if(e <= fechahoy){
+			cval=true;
+		}else{
+			cval=false;
+		}
+		if(!cval){
+			toaster.pop("error", "", "Fecha invalida.", 800, 'trustedHtml');
+			$scope.paciente.fechanacimiento='';
+		}
+    }
+    
+    $scope.precsuma = 0;
+    $scope.precisuma= function(){  
+   	 $scope.precsuma = 0;  
+   	for(var p=0;p < $scope.lsDetalle.length; p++){
+   		$scope.precsuma = $scope.precsuma + $scope.lsDetalle[p].precio;
+   	}
+   	$scope.deleteitem= function(index){
+   		$scope.precsuma=$scope.precsuma-$scope.lsDetalle[index].precio;
+   		$scope.duracsuma=$scope.duracsuma-$scope.lsDetalle[index].tiempoduracion;
+   			$scope.lsDetalle.splice(index, 1);
+      	 
+        }	
+   }
+  
+
+	 $scope.servicio={
+	    		"idservicio":0
+	    };
+	$scope.lsTratamiento=[];
+	$scope.titulonavegacion = "Listado de pacientes";
+	$scope.services = service;
+	$scope.regresar = function() {
+		$scope.accion = 1;
+		$scope.titulonavegacion = "Listado de pacientes";
+		$modalInstance.dismiss('cancel');
+	};
+	
+	$scope.nuevo = function() {
+		 
+		$scope.titulonavegacion = "El paciente no cuenta con odontograma";
+		$scope.pacienteodontograma = {
+			"idpacienteodontograma": 0
+			, "idpaciente": idval
+			, "estado": true
+		};
+	};
+	
+    $scope.agregarTratamiento=function(){      
+      	 var servicio_repetido=false;
+
+      	 if($scope.detalle!=undefined){  
+      		 for(var j=0; j<$scope.lsDetalle.length; j++){  
+      		 if($scope.lsDetalle[j].idservicio==$scope.servicio.obj.idservicio){
+      			 
+      	    	toaster.pop("info", "","Servicio ya fue agregado", 800, 'trustedHtml');
+     			 servicio_repetido=true;
+     			 j=j+$scope.lsDetalle.length;
+      		 }else{servicio_repetido=false}
+      	 	 
+      		 }
+      		if(!servicio_repetido){  
+      		$scope.detalle.count=count;
+   	    	 $scope.lsDetalle.push($scope.servicio.obj);
+   	    	 $scope.duracisuma();
+   	    	 $scope.precisuma();
+   	    	 count=count+1;
+      		}
+      		 $scope.servicio={};
+      		}
+       }
+	
+	
+    $scope.promise3= $http.post($scope.services+"/servicio/list",{ 
+        "accion":1           
+          }).then(function (response) { 
+        if (typeof response.data === 'object') {
+        
+        	$scope.lsServicio =response.data.aaData;  
+        } else {
+        	$scope.lsServicio=[];
+        }
+    }, function (response) {
+    	$scope.lsServicio=[];
+    });  
+	
+	 $scope.evaluaServicio= function(index){   
+	 	 if($scope.lsServicio[index].servicio.check==true){  
+			 $scope.tratamiento.precio=$scope.tratamiento.precio+$scope.lsServicio[index].servicio.precio;
+			 $scope.tratamiento.duracion=$scope.tratamiento.duracion+$scope.lsServicio[index].servicio.tiempoduracion;
+	 	 }else{   
+	 		$scope.tratamiento.precio=$scope.tratamiento.precio-$scope.lsServicio[index].servicio.precio;
+			 $scope.tratamiento.duracion=$scope.tratamiento.duracion-$scope.lsServicio[index].servicio.tiempoduracion;
+	 	 }
+	 }
+	 
+	 // completa campos tipomoneta,condicionespago,sutipocomprovantepago con  1reg de
+		//  de sus respectiva tablas en la BD
+		$http.post($scope.services + '/sutipomoneda/list', {
+			"accion": $scope.accion
+		}).then(function(response) {
+	 		$scope.lsSutipomoneda = response.data.aaData;
+		}, function(x) {
+			toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+		});
+		
+		$http.post($scope.services + '/condicionespago/list', {
+			"accion": $scope.accion
+		}).then(function(response) {
+	 		$scope.lsCondicionespago = response.data.aaData;
+		}, function(x) {
+			toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+		});
+		
+		$http.post($scope.services + '/sutipocomprovantepagodocumento/list', {
+			"accion": $scope.accion
+		}).then(function(response) {
+	 		$scope.lsSutipocomprovantepagodocumento = response.data.aaData;
+		}, function(x) {
+			toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+		});
+ 
+	 
+	$scope.seleccionServicio = function(){   
+		$scope.tratamiento.precio=0;
+		$scope.tratamiento.duracion=0;
+		$scope.lsServicio=[];
+	 	$scope.lsServicio=$scope.tratamiento.obj.lsdetalle;
+	 	for(var i in $scope.lsServicio){  
+	 		 if($scope.lsServicio[i].servicio.check==true){  
+				 $scope.tratamiento.precio=$scope.tratamiento.precio+$scope.lsServicio[i].servicio.precio;
+				 $scope.tratamiento.duracion=$scope.tratamiento.duracion+$scope.lsServicio[i].servicio.tiempoduracion;
+		 	 }
+	 }
+  	 } 
+	
+	 
+	$http.post($scope.services + '/tratamiento/list', {
+		"accion": $scope.accion
+	}).then(function(response) {
+		  
+		$scope.lsTratamiento = response.data.aaData;
+	}, function(x) {
+		toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+	});
+	
+	$http.post($scope.services + '/doctor/list', {
+		"accion": $scope.accion
+	}).then(function(response) {
+		  
+		$scope.lsDoctor = response.data.aaData;
+	}, function(x) {
+		toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+	});
+	
+	
+	/*$scope.selcctratamiento = function() {
+		$scope.titulonavegacion = "El paciente no cuenta con un tratamiento";
+		$scope.tratamiento = {
+			"idtratamiento": 0
+			, "idpaciente": idval
+			, "estado": true
+		};
+	};*/
+	$scope.update = function(mail) {
+		$scope.accion = -1;
+		$http.post($scope.services + '/paciente/finid', {
+			"idpaciente": mail
+		}).then(function(response) {
+			$scope.paciente = response.data.defaultObj;
+			$scope.paciente.fechanacimientostr = $filter('date')($scope.paciente.fechanacimiento, "dd-MM-yyyy")
+			$scope.titulonavegacion = "Actualizar paciente";
+			$scope.titulopaciente = "Actualizar";
+			if ($scope.paciente.idubigeo == undefined) {} else {
+				$http.post($scope.services + '/ubigeo/finid/', {
+					"idubigeo": $scope.paciente.idubigeo
+				}).then(function(response) {
+					$scope.ubigeo = response.data.defaultObj;
+					$http.post($scope.services + '/ubigeo/prov/', {
+						"departamento": $scope.ubigeo.departamento
+					}).then(function(a) {
+						$scope.provincias = a.data.aaData;
+						$http.post($scope.services + '/ubigeo/dist/', {
+							"provincia": $scope.ubigeo.provincia
+						}).then(function(b) {
+							$scope.distritos = b.data.aaData;
+							$scope.departamento = $scope.ubigeo.departamento;
+							$scope.provincia = $scope.ubigeo.provincia;
+						}, function(x) {
+							toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+						});
+					}, function(x) {
+						toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+					});
+					$scope.cuentasbancariasclientes = {};
+				}, function(x) {
+					toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+				});
+			}
+			if ($scope.paciente.estado == 1) {
+				$scope.paciente.estado = true;
+			} else {
+				$scope.paciente.estado = false;
+			}
+		}, function(x) {
+			toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+		});
+	};
+	$scope.ini = function() {
+		if (idval > 0) {
+			$scope.update(idval);
+		} else {
+			$scope.nuevo();
+		}
+	}
+	$scope.ini();
+	
+	$scope.crudPaciente = function(val, mail) {   
+		if ($scope.paciente.estado == true) {
+			$scope.paciente.estado = 1;
+		} else {
+			$scope.paciente.estado = 0;
+		}
+		if (val == 1) {
+			$scope.paciente.accion = '';
+		} else {
+			$scope.paciente = mail;
+			$scope.paciente.accion = "D";
+		};
+		var modalConfirm = $modal.open({
+			templateUrl: 'myModalContentConfirma.html'
+			, controller: 'modalctlConfirma'
+			,
+			size:'sm',
+			backdrop: 'static', keyboard: false,
+			resolve: {
+				item: function() {
+					return $scope.paciente.idpaciente > 0 ? $scope.paciente.idpaciente : 0;
+				}
+				, estado: function() {
+					return val;
+				}
+				, nombre: function() {
+					return $scope.paciente.nombre;
+				}
+			}
+		});
+		modalConfirm.result.then(function() {         
+			   $scope.paciente.fechanacimiento=new Date($scope.paciente.fechanacimiento);
+      	return $scope.promise = $http.post($scope.services + '/paciente/inserta', $scope.paciente)
+			.then(function(response) {   
+				if (response.data.estado == 1) {
+					toaster.pop("success", "", response.data.msg, 800, 'trustedHtml');
+				} else if (response.data.estado == 0) {
+					toaster.pop("success", "", response.data.msg, 800, 'trustedHtml');
+				} else if (response.data.estado == 2) {
+					toaster.pop("info", "", response.data.msg, 800, 'trustedHtml');
+				} else if (response.data.estado == 3) {
+					toaster.pop("error", "", response.data.msg, 800, 'trustedHtml');
+				} else {
+					toaster.pop("error", "", "Error inesperado en el cliente", 800, 'trustedHtml');
+				}
+//				$scope.tableParamsPaciente.reload();
+				$modalInstance.close(response.data);
+
+			}, function(x) {
+				toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+			});
+		}, function() {});
+	};
+
+	
+	$scope.crud = function(val, mail) {
+	 
+		if (val == 1) {
+			$scope.documento.accion = '';
+		} else {
+			$scope.paciente = mail;
+			$scope.document.accion = "D";
+		}
+		var modalConfirm = $modal.open({
+			templateUrl: 'myModalContentConfirma.html'
+			, controller: 'modalctlConfirma'
+			, 
+			size:'sm',
+			backdrop: 'static', keyboard: false,
+			resolve: {
+				item: function() {
+					return $scope.documento.iddocumento > 0 ? $scope.documento.iddocumento : 0;
+				}
+				, estado: function() {
+					return val;
+				}
+				, nombre: function() {
+					return $scope.documento.nombre;
+				}
+			}
+		});
+		modalConfirm.result.then(function() {
+			  
+		/*
+			var lsDetalle=[];
+			for(var i in $scope.lsServicio){
+				if($scope.lsServicio[i].servicio.check==true){
+					lsDetalle.push($scope.lsServicio[i]);
+			 	}
+	 		}*/
+			    
+			$scope.documentos ={
+		    		"accion":'',
+		    		"idclinica": selectedClinica,
+		    		"idsutipomoneda":$scope.lsSutipomoneda[0].idsutipomoneda,
+		    		"idcondicionespago":$scope.lsCondicionespago[0].idcondicionespago,
+		    		"idpaciente":paciente.idpaciente,
+		    		"total":$scope.precsuma,
+		    	    "estado":1,
+		    	    "nombretratamiento":$scope.tratamiento.descripcion,
+		    		"idsutipocomprovantepagodocumento":$scope.lsSutipocomprovantepagodocumento[1].idsutipocomprovantepagodocumento,
+		        	"lsdetalle":$scope.lsDetalle,
+		        	"iddoctor":$scope.doctor.iddoctor
+		    } 
+			 
+			
+			return $scope.promise = $http.post($scope.services + '/documentos/inserta', $scope.documentos)
+			.then(function(response) {  
+				if (response.data.estado == 1) { 
+					toaster.pop("success", "", response.data.msg, 800, 'trustedHtml');
+					$scope.accion = 1;
+					$modalInstance.close(response.data);
+				} else if (response.data.estado == 0) {
+					toaster.pop("success", "", response.data.msg, 800, 'trustedHtml');
+				} else if (response.data.estado == 2) {
+					toaster.pop("info", "", response.data.msg, 800, 'trustedHtml');
+				} else if (response.data.estado == 3) {
+					toaster.pop("error", "", response.data.msg, 800, 'trustedHtml');
+				} else {
+					toaster.pop("error", "", "Error inesperado en el cliente", 800, 'trustedHtml');
+				}
+			}, function(x) {
+				toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+			});
+		}, function() {});
+	};
+	
+	
+	$http.post($scope.services + '/gradoinstitucion/list', {
+		"accion": $scope.accion
+	}).then(function(response) {
+		$scope.gradoinstitucions = response.data.aaData;
+	}, function(x) {
+		toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+	});
+	$http.post($scope.services + '/ocupacion/list', {
+		"accion": $scope.accion
+	}).then(function(response) {
+		$scope.ocupacions = response.data.aaData;
+	}, function(x) {
+		toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+	});
+	$scope.sexox = [{
+		"id": 1
+		, "value": "Masculino"
+	}, {
+		"id": 2
+		, "value": "Femenino"
+	}]
+	$scope.estadoscivil = [{
+		"id": 1
+		, "value": "Soltero"
+	}, {
+		"id": 2
+		, "value": "Conviviente"
+	}, {
+		"id": 3
+		, "value": "Viudo"
+	}, {
+		"id": 4
+		, "value": "Divorciado"
+	}, {
+		"id": 5
+		, "value": "Casado"
+	}]
+	$http.post($scope.services + '/ubigeo/dep', {}).then(function(response) {
+		$scope.ubigeos = response.data.aaData;
+	}, function(x) {
+		toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+	});
+	$scope.retornaProvincia = function(prov) {
+		return $scope.promise = $http.post($scope.services + '/ubigeo/prov', {
+			"departamento": prov
+		}).then(function(response) {
+			$scope.provincias = response.data.aaData;
+		}, function(x) {
+			toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+		});
+	};
+	$scope.retornaDistrito = function(dist) {
+		return $scope.promise = $http.post($scope.services + '/ubigeo/dist', {
+			"provincia": dist
+		}).then(function(response) {
+			$scope.distritos = response.data.aaData;
+		}, function(x) {
+			toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+		});
+	};
+}]);
+app.controller('modalPacienteodontogramaController', ['idpaciente', 'idval', 'selectedClinica', 'service', '$modalInstance', '$scope', '$http', '$modal', '$state', 'ngTableParams', '$q', '$filter', 'toaster', function(idpaciente, idval, selectedClinica, service, $modalInstance, $scope, $http, $modal, $state, ngTableParams, $q, $filter, toaster) {
+	 
+	$scope.accion = 1;
+	$scope.visible = false;
+	$scope.accion = 1;
+	$scope.titulonavegacion = "Listado de pacienteodontogramas";
+	$scope.services = service;
+	$scope.regresar = function() {
+		$scope.accion = 1;
+		$scope.titulonavegacion = "Listado de pacienteodontogramas";
+		$modalInstance.dismiss('cancel');
+	};
+	$scope.retornaLista = function() {
+		$state.go("app.seg.paciente");
+	}
+	$scope.nuevo = function() {
+		$scope.titulonavegacion = "El paciente no cuenta con odontograma";
+		$scope.pacienteodontograma = {
+			"idpacienteodontograma": 0
+			, "idpaciente": idpaciente
+			, "estado": true
+		};
+	};
+	$scope.ini = function() {
+		$scope.nuevo();
+	}
+	$scope.ini();
+	$scope.crud = function(val, mail) {
+		if ($scope.pacienteodontograma.estado == true) {
+			$scope.pacienteodontograma.estado = 1;
+		} else {
+			$scope.pacienteodontograma.estado = 0;
+		}
+		if (val == 1) {
+			$scope.pacienteodontograma.accion = '';
+		} else {
+			$scope.pacienteodontograma = mail;
+			$scope.pacienteodontograma.accion = "D";
+		};
+		var modalConfirm = $modal.open({
+			templateUrl: 'myModalContentConfirma.html'
+			, controller: 'modalctlConfirma'
+			, 
+			size:'sm',
+			backdrop: 'static', keyboard: false,
+			resolve: {
+				item: function() {
+					return $scope.pacienteodontograma.idpacienteodontograma > 0 ? $scope.pacienteodontograma.idpacienteodontograma : 0;
+				}
+				, estado: function() {
+					return val;
+				}
+				, nombre: function() {
+					return $scope.pacienteodontograma.nombre;
+				}
+			}
+		});
+		modalConfirm.result.then(function() {
+			return $scope.promise = $http.post($scope.services + '/pacienteodontograma/inserta', $scope.pacienteodontograma).then(function(response) {
+				if (response.data.estado == 1) {
+					toaster.pop("success", "", response.data.msg, 800, 'trustedHtml');
+					$scope.accion = 1;
+					$modalInstance.close(response.data.defaultObj);
+				} else if (response.data.estado == 0) {
+					toaster.pop("success", "", response.data.msg, 800, 'trustedHtml');
+				} else if (response.data.estado == 2) {
+					toaster.pop("info", "", response.data.msg, 800, 'trustedHtml');
+				} else if (response.data.estado == 3) {
+					toaster.pop("error", "", response.data.msg, 800, 'trustedHtml');
+				} else {
+					toaster.pop("error", "", "Error inesperado en el cliente", 800, 'trustedHtml');
+				}
+			}, function(x) {
+				toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+			});
+		}, function() {});
+	};
+}]);
+app.controller('modalAproController', ['docum', 'idval', 'selectedClinica', 'service', '$modalInstance', '$scope', '$http', '$modal', '$state', 'ngTableParams', '$q', '$filter', 'toaster', 
+	function(docum, idval, selectedClinica, service, $modalInstance, $scope, $http, $modal, $state, ngTableParams, $q, $filter, toaster) {
+	$scope.paciente=docum;
+	$scope.services = service;
+	$scope.convenio={};
+	$scope.convenioPaciente={};
+	$scope.accion=3;
+	$scope.totalPresupuesto={
+			"valor":0
+	};
+	 $scope.convenioActivo={
+			 "value": false
+	 };
+	 $scope.regresar = function() {
+			$scope.accion = 1;
+			$scope.titulonavegacion = "Listado de pacientes";
+			$modalInstance.dismiss('cancel');
+		};
+	$scope.promise = $http.post($scope.services + '/paciente/convxpacnt',
+			{"accion":$scope.accion,"idpaciente":$scope.paciente.idpaciente})
+	.then(function(response) {   
+		if(response.data.estado==1){
+			$scope.convenioPaciente = response.data.defaultObj.convenio;
+			evaluaConvenio();	
+	 	}
+		else{
+			// empresa no tiene convenio con la clinica 
+			calculaTotal();
+			$scope.convenio_msj="Paciente no cuenta con convenio disponible";
+		}
+			
+	}, function(x) {
+		toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+	});
+	
+	evaluaConvenio=function(){   
+		
+		  var fechaActual = 
+			  (new Date()).getFullYear() +(new Date()).getMonth()+(new Date()).getDate() ;
+	 
+		  var fechaFin=
+			  (new Date($scope.convenioPaciente.fechafin)).getFullYear() 
+			  +(new Date($scope.convenioPaciente.fechafin)).getMonth()
+			  +(new Date($scope.convenioPaciente.fechafin)).getDate() ;
+		  
+		  calculaTotal(); 
+		  if(fechaActual<=fechaFin){
+			  calculaDescuentos();
+			  $scope.convenioActivo.value=true;
+		   }
+		  else{ //  convenio ya caduco
+		 		$scope.convenio_msj=$scope.convenioPaciente.fechafin;
+		 	  }
+ 	}
+	calculaTotal = function(){ //total con descuentos
+		var descuento;
+		$scope.totalPresupuesto.valor=0;
+		for(var i in $scope.paciente.lsdetalle){ 
+			if($scope.paciente.lsdetalle[i].servicio.precio){
+				 				
+							if($scope.paciente.lsdetalle[i].descuentodet==undefined){
+								descuento=0;
+							}else{
+								descuento=$scope.paciente.lsdetalle[i].descuentodet;
+							}
+							
+						$scope.totalPresupuesto.valor=$scope.totalPresupuesto.valor+($scope.paciente.lsdetalle[i].servicio.precio*((100-descuento)/100));
+			 		}
+				 	}
+		 		}
+		 	 
+	 
+	calculaDescuentos=function(){   
+	 	var descuento;
+	for(var i=0;i<$scope.paciente.lsdetalle.length;i++){   
+		
+ 	 	for(var j=0;j<$scope.convenioPaciente.lsdetalle.length;j++){   
+	 		if($scope.paciente.lsdetalle[i].idservicio==$scope.convenioPaciente.lsdetalle[j].idservicio){
+	 			  
+	 			$scope.totalPresupuesto.valor=$scope.totalPresupuesto.valor-$scope.paciente.lsdetalle[i].servicio.precio;
+	 			if($scope.paciente.lsdetalle[i].descuentodet==undefined){
+	 				descuento=$scope.convenioPaciente.lsdetalle[j].descuento;
+	 			}else{
+	 				descuento=$scope.paciente.lsdetalle[i].descuentodet;
+	 			}
+	 				
+	 			$scope.paciente.lsdetalle[i].total=
+	 				$scope.paciente.lsdetalle[i].servicio.precio
+	 					*(100-descuento)*(1/100);
+	 			$scope.paciente.lsdetalle[i].descuentodet=descuento;
+	  			$scope.totalPresupuesto.valor=$scope.totalPresupuesto.valor+$scope.paciente.lsdetalle[i].total;
+	 			j=$scope.convenioPaciente.lsdetalle.length;
+	 			
+	 			
+	 		}
+			
+		 }
+	
+	}
+	}
+	
+	$scope.calculaTotales=function(e,index){
+		var key=e;
+    	var cval=false;
+    	if(key>=0 && key<=100){ 				
+    		cval=true;
+		}else{
+			cval=false;	    				
+		}
+    	if(!cval){
+			toaster.pop("error", "", "Descuento invalido.", 800, 'trustedHtml');
+			$scope.paciente.lsdetalle[index].descuentodet='';
+		}else{
+			
+			var total_antes;  	  
+			if($scope.paciente.lsdetalle[index].descuentodet==undefined){  
+				 
+				$scope.totalPresupuesto.valor=
+					$scope.totalPresupuesto.valor
+					-$scope.paciente.lsdetalle[index].total
+					+$scope.paciente.lsdetalle[index].servicio.precio;
+				
+				$scope.paciente.lsdetalle[index].total=
+					$scope.paciente.lsdetalle[index].servicio.precio;
+			
+			}
+			
+			else{     
+					if($scope.paciente.lsdetalle[index].total==undefined){
+						total_antes=$scope.paciente.lsdetalle[index].servicio.precio;
+					}else{
+						total_antes=$scope.paciente.lsdetalle[index].total;
+					}
+				$scope.paciente.lsdetalle[index].total=
+					$scope.paciente.lsdetalle[index].servicio.precio
+						*(100-$scope.paciente.lsdetalle[index].descuentodet)*(1/100);
+			$scope.totalPresupuesto.valor=$scope.totalPresupuesto.valor
+				-total_antes
+				+$scope.paciente.lsdetalle[index].total;
+			}
+			calculato();
+		}
+ 	}
+	
+	calculato=function(){
+		for(var i=0;i<$scope.paciente.lsdetalle.length;i++){ 
+			if($scope.paciente.lsdetalle[i].descuentodet !=undefined){
+				$scope.paciente.lsdetalle[i].total=
+					$scope.paciente.lsdetalle[i].servicio.precio*((100-$scope.paciente.lsdetalle[i].descuentodet)/100);
+			}else{
+				$scope.paciente.lsdetalle[i].total=$scope.paciente.lsdetalle[i].servicio.precio;
+			}
+		}
+	}
+	 
+	calculato();
+	
+	$scope.vemonto=false;
+	$scope.vedes=false;  
+	$scope.desduro=false
+		
+	
+	
+	$scope.selecconvenio=function(){
+	$scope.descuento=$scope.convenio.obj.porcentaje_desc;
+	for(var i=0;i<$scope.paciente.lsdetalle.length;i++){
+		$scope.paciente.lsdetalle[i].descuentodet=0;
+	};
+	calculadescu();
+		
+}
+	$scope.todescuento;
+	function calculadescu(){
+		$scope.todescuento=0;
+		var t=0;
+		var td=0;
+		var m=0;
+		var tt=0;
+		$scope.chemon=false;
+		$scope.check=false;
+		var vemonto = false;
+		var veserv=false;
+		for(var i=0;i<$scope.convenio.obj.lsdetalle.length;i++){
+			if($scope.convenio.obj.lsdetalle[i].monto != undefined){
+				m=$scope.convenio.obj.lsdetalle[i].monto;
+				vemonto=true;
+			}else{
+				if($scope.convenio.obj.lsdetalle[i].idservicio != undefined){
+					veserv=true;
+				}
+			}				
+		}
+		if(!vemonto && veserv){ // solo servicios
+			for(var a=0;a<$scope.paciente.lsdetalle.length;a++){ 
+				for(var b=0;b<$scope.convenio.obj.lsdetalle.length;b++){
+				if($scope.paciente.lsdetalle[a].idservicio == $scope.convenio.obj.lsdetalle[b].idservicio){
+					$scope.paciente.lsdetalle[a].total=($scope.paciente.lsdetalle[a].servicio.precio-($scope.descuento*$scope.paciente.lsdetalle[a].servicio.precio)/100);
+					$scope.paciente.lsdetalle[a].descuentodet=($scope.descuento*$scope.paciente.lsdetalle[a].servicio.precio)/100;
+					td=td+(($scope.descuento*$scope.paciente.lsdetalle[a].servicio.precio)/100);
+					$scope.paciente.lsdetalle[a].desc=true;
+					b=b+$scope.convenio.obj.lsdetalle.length;
+					}else{
+						$scope.paciente.lsdetalle[a].desc=false;
+					}
+				}
+			}
+		}else{
+			if(veserv && vemonto){ // servicio y monto
+				for(var a=0;a<$scope.paciente.lsdetalle.length;a++){ 
+					for(var b=0;b<$scope.convenio.obj.lsdetalle.length;b++){
+					if($scope.paciente.lsdetalle[a].idservicio == $scope.convenio.obj.lsdetalle[b].idservicio){
+						$scope.paciente.lsdetalle[a].total=($scope.paciente.lsdetalle[a].servicio.precio-($scope.descuento*$scope.paciente.lsdetalle[a].servicio.precio)/100);
+						$scope.paciente.lsdetalle[a].descuentodet=($scope.descuento*$scope.paciente.lsdetalle[a].servicio.precio)/100;
+						tt=tt+$scope.paciente.lsdetalle[a].servicio.precio;
+						td=td+(($scope.descuento*$scope.paciente.lsdetalle[a].servicio.precio)/100);
+						$scope.paciente.lsdetalle[a].desc=true;
+						b=b+$scope.convenio.obj.lsdetalle.length;
+						}else{
+							$scope.paciente.lsdetalle[a].desc=false;
+						}
+					}
+				}
+				if(tt>m){
+					$scope.check=true
+				}
+			}else{ //solo monto
+				for(var a=0;a<$scope.paciente.lsdetalle.length;a++){ 
+					t=t+$scope.paciente.lsdetalle[a].servicio.precio;
+				}
+				if(t>m){
+					$scope.chemon=true;
+					for(var a=0;a<$scope.paciente.lsdetalle.length;a++){
+						$scope.paciente.lsdetalle[a].total=($scope.paciente.lsdetalle[a].servicio.precio-($scope.descuento*$scope.paciente.lsdetalle[a].servicio.precio)/100);
+						$scope.paciente.lsdetalle[a].descuentodet=($scope.descuento*$scope.paciente.lsdetalle[a].servicio.precio)/100;
+						td=td+(($scope.descuento*$scope.paciente.lsdetalle[a].servicio.precio)/100);
+					}
+				}
+			}
+		}	
+			
+		$scope.todescuento=td;
+	}
+	
+	$scope.crud=function(val,mail){
+		
+		$scope.paciente.lsdetalle;
+		
+		if(val==1){
+		$scope.paciente.accion=''
+		}
+		var modalConfirm = $modal.open({
+			templateUrl: 'myModalContentConfirma.html'
+			, controller: 'modalctlConfirma'
+			, 
+			size:'sm',
+			backdrop: 'static', keyboard: false,
+			resolve: {
+				item: function() {
+					return $scope.paciente.idpaciente > 0 ? $scope.paciente.idpaciente : 0;
+				}
+				, estado: function() {
+					return idval ;
+				}
+				, nombre: function() {
+					return $scope.paciente.paciente.nombre;
+				}
+			}
+		});
+		modalConfirm.result.then(function() {
+			  
+			 
+			$scope.totalPresupuesto.valor;
+			var total=0,subtotal=0;
+			for(var i in $scope.paciente.lsdetalle){
+				total=total+$scope.paciente.lsdetalle[i].total;
+	 		}
+			for(var j in $scope.paciente.lsdetalle){
+				subtotal=subtotal+$scope.paciente.lsdetalle[i].servicio.precio;
+	 		}
+			
+			var documento={
+				"iddocumentos":$scope.paciente.iddocumentos,
+				"descuento":$scope.todescuento,
+				"total":total,
+				"lsdetalle":$scope.paciente.lsdetalle,
+				"estado":3,
+				"accion":1
+		}
+		
+		   
+		return $scope.promise = $http.post($scope.services + '/documentos/inserta', documento).then(function(response) {
+				if (response.data.estado == 1) {
+					toaster.pop("success", "", response.data.msg, 800, 'trustedHtml');
+					$scope.accion = 1;
+					$modalInstance.close(response.data.defaultObj);
+				} else if (response.data.estado == 0) {
+					toaster.pop("success", "", response.data.msg, 800, 'trustedHtml');
+				} else if (response.data.estado == 2) {
+					toaster.pop("info", "", response.data.msg, 800, 'trustedHtml');
+				} else if (response.data.estado == 3) {
+					toaster.pop("error", "", response.data.msg, 800, 'trustedHtml');
+				} else {
+					toaster.pop("error", "", "Error inesperado en el cliente", 800, 'trustedHtml');
+				}
+			}, function(x) {
+				toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+			});
+		}, function() {});
+	}
+}]);
+
+app.controller('modalpagos', ['paciente', 'idval', 'selectedClinica', 'service', '$modalInstance', '$scope', '$http', '$modal', '$state', 'ngTableParams', '$q', '$filter', 'toaster', function(paciente, idval, selectedClinica, service, $modalInstance, $scope, $http, $modal, $state, ngTableParams, $q, $filter, toaster) {
+	$scope.pacientes=paciente;
+	$scope.services=service;
+	$scope.pago={};
+	var hoy=new Date;
+	$scope.pago.fechapago=hoy;
+	$scope.accion=1;
+	
+	$scope.promise = $http.post($scope.services + '/condicionespago/list',{"accion":1}).then(function(response) {
+		$scope.mediopago=response.data.aaData;
+	}, function(x) {
+		toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+	});
+	$scope.promise = $http.post($scope.services + '/sutipocomprovantepagodocumento/list',{"accion":1}).then(function(response) {
+		$scope.comprovante=response.data.aaData;
+	}, function(x) {
+		toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+	});
+	$scope.nsaldo=0;
+	$scope.verificamonto=function(m){
+		$scope.nsaldo=0;
+		if(m<=$scope.pacientes.totalfin){
+			$scope.nsaldo=$scope.pacientes.totalfin-m;
+		}else{toaster.pop("info", "", "El monto ingresado excede el saldo pendiente", 800, 'trustedHtml');
+		$scope.pago.montocancelado='';}
+	}
+	$scope.regresar = function() {
+    	$modalInstance.dismiss('cancel');
+    }
+	
+	$scope.regpago=function(val){
+		var modalConfirm = $modal.open({
+			templateUrl: 'myModalContentConfirma.html'
+			, controller: 'modalctlConfirma'
+			, 
+			size:'sm',
+			backdrop: 'static', keyboard: false,
+			resolve: {
+				item: function() {
+					return $scope.pacientes.paciente.idpaciente > 0 ? $scope.pacientes.paciente.idpaciente : 0;
+				}
+				, estado: function() {
+					return val ;
+				}
+			}
+		});	modalConfirm.result.then(function() {
+					
+			if($scope.nsaldo==0)
+				{
+				$scope.accion=5;
+				}else{
+					$scope.accion=4;
+				}
+			var pago={
+				"iddocumentos":$scope.pacientes.iddocumentos,
+				"montocancelado":$scope.pago.montocancelado,
+				"fechapago":$scope.pago.fechapago,
+				"estado":1,
+				"accion":$scope.accion,
+		}		
+			
+		return $scope.promise = $http.post($scope.services + '/pago/inserta', pago).then(function(response) {
+				if (response.data.estado == 1) {
+					$scope.accion = 1;
+					$modalInstance.close(response.data);
+				}
+			}, function(x) {
+				toaster.pop("error", "", "No es posible conectarse con el servicio web", 800, 'trustedHtml');
+			});
+		}, function() {});
+	}	
+}]);
+

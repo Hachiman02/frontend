@@ -1,0 +1,1807 @@
+<meta charset="utf-8" />
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.0/angular.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.0/angular-animate.min.js"></script>
+<script src="script.js"></script>
+<script type="text/ng-template"
+	id="modalTratamientoController.html">
+    <div ng-include="'tpl/paciente/tratamientonew.html'"></div>
+</script>
+<script type="text/ng-template" id="modalPresupuestoApro.html">
+    <div ng-include="'tpl/paciente/ModalPresupuestoApro.html'"></div>
+</script>
+<script type="text/ng-template" id="modalPagos.html">
+    <div ng-include="'tpl/paciente/pagosnew.html'"></div>
+</script>
+
+<div class="col wrapper-md" style="overflow-y:auto;height:473px;">
+	<form name="formValidateDatGen" class="form-horizontal form-validation col-sm-12">
+	<div class="col-sm-8">
+		<div class="col-sm-3" style="padding-bottom:15px">
+		<img src="img/user.png" class="img-full" alt="..." style="border-radius:100px">
+		</div>
+		<div class="col-sm-9">
+		<div class=""  style="background:; padding-right:220px">	
+			<div class="form-group">
+			<label class="col-sm-8" style="font-size:20px;">{{nombrepaciente}}</label>
+			</div>
+		</div>
+		<div class="" style="background:; padding-right:220px">	
+			<div class="form-group">
+			<label class="col-sm-8">
+			<span class="glyphicon glyphicon-envelope"></span>&nbsp&nbsp&nbsp&nbsp{{paciente.email}}</label>
+			</div>
+		</div>
+		<div class="" style="background:; padding-right:220px">	
+			<div class="form-group">
+			<label class="col-sm-8">
+			<span class="glyphicon glyphicon-earphone"></span>&nbsp&nbsp&nbsp&nbsp{{paciente.telefono}}</label>
+			</div>
+		</div>
+		</div>
+	</div>
+	<div class="col-sm-4" style="background:" >
+		<div class="col-sm-6 col-sm-offset-3" style="width:110px;background:" ng-if="tpaf==0? true : false">
+		<img src="img/check.png" class="img-full" alt="...">
+		<center><label class="">No tiene saldo pendiente</label></center>
+		</div>
+		<div class="col-sm-6 col-sm-offset-3" style="width:110px" ng-if="tpaf>0? true : false">
+		<img src="img/adver.png" class="img-full" alt="..." >
+		<center><label class="">Tiene saldo pendiente !!!</label></center>
+		</div>
+	</div>
+	</form>
+
+
+	<tabset class="tab-container" > <tab> <tab-heading>
+	Datos personales <span class="badge badge-sm m-l-xs"></span> </tab-heading>
+	<form name="formValidateDatGen" class="form-horizontal form-validation">
+	<fieldset><legend>Identificacion de Paciente</legend>
+		<div class="form-group" ng-hide="{{paciente.idpaciente>0?false:true}}">
+			<div class="col-sm-2"></div>
+			<div class="col-sm-2">
+				<label class="control-label">Nro:</label>
+				<input type="text" class="form-control" disabled="true"
+					placeholder="Ingrese idpaciente" ng-model="paciente.idpaciente"
+					required>
+			</div>
+		</div>
+		<div class="form-group">
+		<div class="col-sm-2"></div>
+			<div class="col-sm-2">
+				<label class=" control-label">Nombres:</label>
+				<input type="text" class="form-control"
+					placeholder="Ingrese nombres del paciente"
+					ng-model="paciente.nombre" ng-change="validarnombre(paciente.nombre)" required>
+			</div>
+		</div>
+		<div class="form-group">
+			<div class="col-sm-2"></div>
+			<div class="col-sm-2">
+			<label class="control-label">Apellido Pat:</label>
+				<input type="text" class="form-control"
+					placeholder="Ingrese apellido paterno" 
+					ng-model="paciente.apepat" ng-change="validarapepat(paciente.apepat)" required>
+			</div>
+			
+			<div class="col-sm-2">
+			<label class="control-label">Apellido Mat:</label>
+				<input type="text" class="form-control"
+					placeholder="Ingrese apellido materno" 
+					ng-model="paciente.apemat" ng-change="validarapemat(paciente.apemat)"> 
+			</div>
+		</div>
+		<div class="form-group">
+			<div class="col-sm-2"></div>
+			<div class="col-sm-2">
+			<label class="control-label">Dni:</label>
+				<input ng-blur="buscarPorFiltro(paciente.documentoidentidad);"
+					type="text" ng-disabled="paciente.idpaciente > 0 ? true : false"
+					class="form-control" placeholder="Ingrese documento identidad"
+					ng-model="paciente.documentoidentidad" required>
+			</div>
+		</div>
+		<div class="form-group">
+			<div class="col-sm-2"></div>
+			<div class="col-sm-2" ng-controller="DatepickerDemoCtrl">
+			<label class="control-label">Fecha de nacimiento:</label>
+				<div class="input-group">
+					<input type="text"
+						class="form-control ng-valid-maxlength ng-valid-parse ng-invalid ng-invalid-required ng-touched"
+						datepicker-popup="{{format}}" is-open="opened"
+						ng-model="paciente.fechanacimiento" ng-change="validarfechanac(paciente.fechanacimiento)"
+						datepicker-options="dateOptions" required="true"
+						close-text="Close" /> <span class="input-group-btn">
+						<button type="button" class="btn btn-xs btn-icon  "
+							ng-click="open($event)">
+							<i class="glyphicon glyphicon-calendar"></i>
+						</button>
+					</span>
+				</div>
+			</div>
+
+			<div class="col-sm-2">
+			<label class="control-label">Edad</label>
+				<input type="number" class="form-control" placeholder="Ingrese edad"
+					ng-model="paciente.edad" ng-change="validaredad(paciente.edad)">
+			</div>
+		</div>
+		<div class="form-group">
+		<div class="col-sm-2"></div>
+			<div class="col-md-3">	
+			<label class="control-label"> Lugar de Nacimiento: </label>
+				<ui-select ng-model="paciente.idubigeo" theme="bootstrap" style="min-width: 300px;"
+					ng-change="retornaProvincia(departamento.departamento)">
+					<ui-select-match placeholder="Departamento">{{$select.selected.departamento}}</ui-select-match>
+					<ui-select-choices
+							repeat="value in ubigeos | propsFilter: {departamento: $select.search}">
+						<small>
+					 	<span ng-bind-html="value.departamento | highlight: $select.search"></span>
+						</small> 
+						</ui-select-choices> 
+				</ui-select> <span ng-show="myForm.idubigeo.$dirty && myForm.idubigeo.$invalid"
+					class="help-inline">Departamento requerido!</span>
+			</div>
+			<div class="col-md-3 ">
+			<label class="control-label" style="color:#ffffff">.</label>
+					<ui-select ng-model="provincia" theme="bootstrap" style="min-width: 300px;" ng-disabled="cat.bloql"
+					ng-change="retornaDistrito(provincia.provincia)">
+					<ui-select-match placeholder="Provincia">{{$select.selected.provincia}}</ui-select-match>
+					<ui-select-choices
+							repeat="value in provincias | propsFilter: {provincia: $select.search}">
+						<small>
+					 	<span ng-bind-html="value.provincia | highlight: $select.search"></span>
+						</small> 
+						</ui-select-choices> 
+				</ui-select> <span ng-show="myForm.idubigeo.$dirty && myForm.idubigeo.$invalid"
+					class="help-inline">Provincia requerida!</span>
+			</div>
+			<div class="col-md-3">
+			<label class="control-label" style="color:#ffffff">.</label>
+				<ui-select ng-model="paciente.idubigeo" theme="bootstrap" style="min-width: 300px;" ng-disabled="cat.bloql">
+					<ui-select-match placeholder="Distrito">{{$select.selected.distrito}}</ui-select-match>
+					<ui-select-choices
+							repeat="value.idubigeo as value in distritos | propsFilter: {distrito: $select.search}">
+						<small>
+					 	<span ng-bind-html="value.distrito | highlight: $select.search"></span>
+						</small> 
+						</ui-select-choices> 
+				</ui-select><span ng-show="myForm.idubigeo.$dirty && myForm.idubigeo.$invalid"
+					class="help-inline">Distrito requerido!</span>
+			</div>
+			</div>
+			<div class="form-group">
+			<div class="col-sm-2"></div>
+			<div class="col-sm-2">
+			<label class="control-label">Telefono Fijo:</label>
+				<input type="text" class="form-control" maxlength="7"
+					placeholder="Ingrese telefono" 
+					ng-model="paciente.telefono" ng-change="validartlf(paciente.telefono)" required>
+			</div>
+			<div class="col-sm-2">
+			<label class="control-label">Telefono Celular:</label>
+				<input type="text" class="form-control" maxlength="9"
+					placeholder="Ingrese celular" 
+					ng-model="paciente.celular" ng-change="validarcel(paciente.celular)">
+			</div>
+			</div>
+			<div class="form-group">
+			<div class="col-sm-2"></div>
+			<div class="col-sm-2">
+			<label class="control-label">Estado civil:</label>
+				<ui-select ng-model="paciente.estadocivil" theme="bootstrap" style="min-width: 100px;">
+					<ui-select-match placeholder="Estado Civil">{{$select.selected.value}}</ui-select-match>
+					<ui-select-choices
+							repeat="value.id as value in estadoscivil | propsFilter: {value: $select.search}">
+						<small>
+					 	<span ng-bind-html="value.value | highlight: $select.search"></span>
+						</small> 
+						</ui-select-choices> 
+				</ui-select>
+			</div>
+			<div class="col-sm-2">
+			<label class="control-label">Religion:</label>
+				<ui-select theme="bootstrap" style="min-width:100px" ng-model="paciente.idreligion">
+					<ui-select-match placeholder="Religion">{{$select.selected.descripcion}}</ui-select-match>
+					<ui-select-choices repeat="value.idreligion as value in religions | propsFilter: {descripcion: $select.search}">
+						<small>
+							<span ng-bind-html="value.descripcion | highlight: $select.search"></span>
+						</small>
+					</ui-select-choices>
+				</ui-select>
+			</div>
+			</div>
+			<div class="form-group">
+			<div class="col-sm-2"></div>
+			<div class="col-md-2">
+			<label class="control-label"> Grado instruccion: </label> 
+				<ui-select theme="bootstrap" style="min-width:100px" ng-model="paciente.idgradoinstitucion">
+					<ui-select-match placeholder="Grado Instruccion">{{$select.selected.descripcion}}</ui-select-match>
+					<ui-select-choices repeat="value.idgradoinstitucion as value in gradoinstitucions | propsFilter: {descripcion: $select.search}">
+						<small>
+							<span ng-bind-html="value.descripcion | highlight: $select.search"></span>
+						</small>
+					</ui-select-choices>
+				</ui-select><span ng-show="myForm.idgradoinstitucion.$dirty && myForm.idgradoinstitucion.$invalid"
+					class="help-inline">idgradoinstitucion requerido!</span>
+			</div>
+			<div class="col-md-2">		
+			<label class="control-label"> Ocupacion:
+			</label>
+					<ui-select theme="bootstrap" style="min-width:100px" ng-model="paciente.idocupacion">
+					<ui-select-match placeholder="Ocupacion">{{$select.selected.descripcion}}</ui-select-match>
+					<ui-select-choices repeat="value.idocupacion as value in ocupacions | propsFilter: {descripcion: $select.search}">
+						<small>
+							<span ng-bind-html="value.descripcion | highlight: $select.search"></span>
+						</small>
+					</ui-select-choices>
+				</ui-select><span ng-show="myForm.idocupacion.$dirty && myForm.idocupacion.$invalid"
+					class="help-inline">idocupacion requerido!</span>
+			</div>
+			</div>
+			</fieldset>
+			<fieldset>
+			<legend>Referencias 
+			<label class="cruds" ng-click="crudReferencia(1, 2)">
+			<span style="color:blue; font-size: 10pt">Actualizar Referencia</span>
+		</label></legend>
+			<div class="form-group">
+			<div class="col-sm-2"></div>
+			<div class="col-sm-8">
+			<label class="control-label">Direccion:</label>
+				<input type="text" class="form-control"
+					placeholder="Ingrese direccion" ng-model="paciente.direccion">
+			</div>
+			</div>
+			<div class="form-group">
+			<div class="col-sm-2"></div>
+			<div class="col-sm-8">
+			<label class="control-label">Referencia</label>
+				<input type="text" class="form-control"
+					placeholder="Ingrese referencia" ng-model="paciente.referencia">
+			</div>
+			</div>
+			<div class="form-group">
+			<div class="col-sm-2"></div>
+			<div class="col-md-2">
+			<label class="control-label">Empresa:</label>
+					<ui-select theme="bootstrap" style="min-width:100px" ng-model="paciente.idempresa">
+					<ui-select-match placeholder="Empresa">{{$select.selected.razonsocial}}</ui-select-match>
+					<ui-select-choices repeat="value.idempresa as value in empresas | propsFilter: {razonsocial: $select.search}">
+						<small>
+							<span ng-bind-html="value.razonsocial | highlight: $select.search"></span>
+						</small>
+					</ui-select-choices>
+				</ui-select>
+					
+			</div>
+			</div>
+			<div class="form-group">
+			<div class="col-sm-2"></div>
+			<div class="col-md-4">
+			<label class="control-label">En caso sea necesario llamar a:</label>
+			</div>
+			</div>
+			<div class="form-group">
+			<div class="col-sm-2"></div>
+			<div class="col-sm-2">
+			<label class="control-label">Nombre:</label>
+				<input type="text" class="form-control"
+					placeholder="Ingrese nombre" ng-model="familiar.nombre">
+			</div>
+			<div class="col-sm-2">
+			<label class="control-label">Telefono:</label>
+				<input type="text" class="form-control"
+					placeholder="Ingrese telefono" ng-model="familiar.telefono">
+			</div>
+			</div>
+			<div class="form-group">
+			<div class="col-sm-2"></div>
+			<div class="col-md-2">
+			<label class="control-label"> Parentezco: </label>
+				<ui-select theme="bootstrap" style="min-width:100px" ng-model="familiar.parentezco" ng-change="seteaParentezco(familiar.parentezco)">
+					<ui-select-match placeholder="Parentezco">{{$select.selected.descripcion}}</ui-select-match>
+					<ui-select-choices repeat="value as value in parentezcos | propsFilter: {descripcion: $select.search}">
+						<small>
+							<span ng-bind-html="value.descripcion | highlight: $select.search"></span>
+						</small>
+					</ui-select-choices>
+				</ui-select>
+			</div>
+			<div class="col-sm-2">
+			<label class="control-label">Ubicacion de {{familiar.parentezco.descripcion}} :</label>
+				<input type="text" class="form-control"
+					placeholder="Ingrese ubicacion" ng-model="familiar.ubicacion">
+			</div>
+			</div>
+			<div class="form-group">
+			<div class="col-sm-2"></div>
+			<div class="col-sm-2">
+			<label class="control-label">¿Como nos contacto?:</label>
+				<input type="text" class="form-control"
+					placeholder="Ingrese la referencia" ng-model="paciente.comonoscontacto">
+			</div>
+			</div>
+			<div class="form-group">
+			<div class="col-sm-2"></div>
+			<div class="col-sm-2">
+			<label class="control-label">Observacion:</label>
+				<input type="text" class="form-control"
+					placeholder="Ingrese la observacion" ng-model="paciente.observacion">
+			</div>
+			</div>
+			</fieldset>
+			<div class="modal-footer">
+		<button type="button" tooltip-placement="left"
+			tooltip="Click para regresar a la lista"
+			class="btn btn-sm btn-default btn-addon" ng-click="regresar()">
+			<i class="fa fa-check-square"></i>Regresar
+		</button>
+			<button type="submit" ng-disabled="formValidateDatGen.$invalid"
+				ng-click="crud(1, 2)" class="btn btn-sm btn-success btn-addon"
+				tooltip-placement="right"
+				tooltip="{{titulopaciente}} nuevo paciente.">
+				<i class="glyphicon glyphicon-floppy-disk"></i>{{paciente.idpaciente==0?'Insertar':'Actualizar'}}
+			</button>
+		</div>
+	</form>
+
+
+	</tab>  <tab> <tab-heading> Anamnesis general <span
+		class="badge badge-sm m-l-xs"></span> </tab-heading>
+	<form name="formValidateAma" class="form-horizontal form-validation">
+	
+<fieldset>
+	<legend>Enfermedad Actual
+		<label class="cruds" ng-click="crudAnamnesis(1, 2)">
+			<span style="color:blue; font-size: 10pt">{{anamnesis.idanamnesis==0?'Insertar Enfermedad':'Actualizar Enfermedad'}}</span>
+		</label>
+		<button style="float:right ;margin-bottom:5px" type="submit" ng-disabled="formValidateAma.$invalid"
+				ng-click="crudtotal()"
+				class="btn btn-sm btn-success btn-addon" tooltip-placement="right"
+				tooltip="{{titulopaciente}} antecedentes.">
+				<i class="glyphicon glyphicon-refresh"></i>{{anamnesis.idnamnesis==0?'Inserta':'Actualización General'}}
+		</button>
+	</legend>
+		<div class="form-group">
+		<div class="col-sm-1"></div>
+			<div class="col-sm-6">
+				<label class=" control-label">Motivo de Consulta:</label>
+				<input class="form-control" placeholder="Ingrese motivo de consulta" ng-model="anamnesis.motv_consulta"/>
+			</div>
+		</div>
+		<div class="form-group">
+		<div class="col-sm-1"></div>
+			<div class="col-sm-6">
+				<label class=" control-label">Signos y sintomas principales:</label>
+				<input class="form-control" placeholder="Ingrese signos y sintomas principales" ng-model="anamnesis.sintomas_principales"/>
+			</div>
+		</div>
+</fieldset>
+<fieldset>
+	<legend>Antecedentes
+		<label class="cruds" ng-click="crudAntecedente(1, 2)">
+			<span style="color:blue; font-size: 10pt">Actualizar Antecedente</span>
+		</label>
+	</legend>
+		
+	<div class="form-group" ng-repeat="arrays in lsarrays">
+		<div class="col-sm-1"></div>
+		<div ng-repeat="enfermedad in arrays">
+			<label class="col-sm-1 control-label"style="background:">{{enfermedad.nombre}} {{enfermedad.observacion}} : </label>  
+			<div class="col-sm-2">
+				<div class="input-group"  ng-init="enfermedad.botonoff = true">
+					   	<span class="input-group-btn">
+ 							<button style="height:34px" class="btn btn-xs btn-icon btn-info"
+ 									ng-if="enfermedad.observacion!='' &&  enfermedad.observacion!=undefined
+ 									?enfermedad.botonoff=false:enfermedad.botonoff" ng-click="enfermedad.botonoff=false">
+								<i class="fa fa-circle-o"></i>
+							</button>
+							<button style="height:34px" class="btn btn-xs btn-icon btn-info" 
+									ng-if="!enfermedad.botonoff" ng-click="enfermedad.botonoff=true">
+								<i class="fa fa-dot-circle-o" ></i>
+							</button>
+						</span>
+						<input class="form-control" ng-disabled="enfermedad.botonoff"
+							ng-model="enfermedad.observacion" ng-click="ver($index)"/>
+				</div>	 
+			</div>
+		</div>
+	</div>
+	
+	<div class="form-group">
+			<div class="col-sm-1"></div>
+			<div class="col-sm-8">
+				<label class=" control-label">Operaciones Previas:</label>
+				<textarea class="form-control rounded-0" rows="1" placeholder="Ingrese operaciones previas" 
+					ng-model="antecedente.operaciones_previas"/></textarea>
+			</div>
+	</div>
+	<div class="form-group">
+			<div class="col-sm-1"></div>
+			<div class="col-sm-8">
+				<label class=" control-label">¿Ha tenido complicaciones? :</label>
+				<textarea class="form-control rounded-0" rows="1" placeholder="Ingrese complicaciones previas" 
+					ng-model="antecedente.complicaciones_previas"/></textarea>
+			</div>
+	</div>
+	<div class="form-group">
+			<div class="col-sm-1"></div>
+			<div class="col-sm-8">
+				<label class=" control-label">¿Que tratamiento odontologico le realizaron y hace cuanto tiempo fue? :</label>
+				<textarea class="form-control rounded-0" rows="1" placeholder="Ingrese tratamientos previos" 
+					ng-model="antecedente.tratamientos_previos"/></textarea>
+			</div>
+	</div>
+	<div class="form-group">
+		<div class="col-sm-1"></div>
+		<div class="col-sm-6">
+			<div class="col-sm-6">
+				<label class=" control-label"> ¿Se cepilla los dientes a diario? :</label>
+			</div>
+			<div class="col-sm-7">
+				<div class="btn-group" data-toggle="buttons">
+        			<label class="btn active">
+         				<input type="radio" name='cepillarboton'
+         					ng-model=antecedente.cepillado_diario value='Si' ng-checked="antecedente.cepillado_diario=='Si'">
+          				<i class="fa fa-circle-o fa-1x"></i>
+          				<i class="fa fa-dot-circle-o fa-1x"></i> 
+          				<span> Si</span>
+        			</label>
+        			<label class="btn">
+         				<input type="radio" name='cepillarboton' 
+         					ng-model=antecedente.cepillado_diario value="No" ng-checked="antecedente.cepillado_diario=='No'">
+          				<i class="fa fa-circle-o fa-1x"></i>
+          				<i class="fa fa-dot-circle-o fa-1x"></i> 
+          				<span> No</span>
+        			</label>
+      			</div>
+    		</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<div class="col-sm-1"></div>
+		<div class="col-sm-6">
+			<div class="col-sm-6">
+				<label class=" control-label"> ¿Usa hilo dental? :</label>
+			</div>
+			<div class="col-sm-7">
+				<div class="btn-group btn-group" data-toggle="buttons">
+        			<label class="btn">
+         				<input type="radio" name="hilodentalboton"
+  							ng-model=antecedente.hilo_dental value="Si" ng-checked="antecedente.hilo_dental=='Si'"/>
+          				<i class="fa fa-circle-o fa-1x"></i>
+          				<i class="fa fa-dot-circle-o fa-1x"></i> 
+          				<span> Si</span>
+        			</label>
+        			<label class="btn">
+         				<input type="radio" name="hilodentalboton"
+  							ng-model=antecedente.hilo_dental value="No" ng-checked="antecedente.hilo_dental=='No'">
+          				<i class="fa fa-circle-o fa-1x"></i>
+          				<i class="fa fa-dot-circle-o fa-1x"></i> 
+          				<span> No</span>
+        			</label>
+      			</div>
+    		</div>
+		</div>
+	</div>
+	
+	<div class="form-group">
+			<div class="col-sm-1"></div>
+			<div class="col-sm-8">
+				<label class=" control-label"><b>¿Se muerde? :</b></label>
+			</div>
+	</div>
+		<div class="form-group">
+			<div class="col-sm-4">
+				<div class="col-sm-2"></div>
+				<label class=" control-label col-sm-4">Labios:</label>
+				<div class="form-check form-check-inline">
+					<div class="btn-group btn-group" data-toggle="buttons">
+        				<label class="btn" class="col-sm-2">
+         					<input type="radio" name="labiosboton"
+  								ng-model=antecedente.labios value="Si" ng-checked="antecedente.labios=='Si'"/>
+          					<i class="fa fa-circle-o fa-1x"></i><i class="fa fa-dot-circle-o fa-1x"></i> 
+          					<span> Si</span>
+        				</label>
+        				<label class="btn" class="col-sm-2">
+         					<input type="radio" name="labiosboton"
+  								ng-model=antecedente.labios value="No" ng-checked="antecedente.labios=='No'">
+          					<i class="fa fa-circle-o fa-1x"></i><i class="fa fa-dot-circle-o fa-1x"></i> 
+          					<span> No</span>
+        				</label>
+      				</div>
+    			</div>
+			</div>
+			<div class="col-sm-4">
+				<label class=" control-label col-sm-2">Uñas:</label>
+				<div class="form-check form-check-inline">
+					<div class="btn-group btn-group" data-toggle="buttons">
+        				<label class="btn" class="col-sm-2">
+         					<input type="radio" name="unasboton"
+  								ng-model=antecedente.unas value="Si" ng-checked="antecedente.unas=='Si'"/>
+          					<i class="fa fa-circle-o fa-1x"></i><i class="fa fa-dot-circle-o fa-1x"></i> 
+          					<span> Si</span>
+        				</label>
+        				<label class="btn" class="col-sm-2">
+         					<input type="radio" name="unasboton"
+  								ng-model=antecedente.unas value="No" ng-checked="antecedente.unas=='No'"/>
+          					<i class="fa fa-circle-o fa-1x"></i><i class="fa fa-dot-circle-o fa-1x"></i> 
+          					<span> No</span>
+        				</label>
+      				</div>
+    			</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<div class="col-sm-4">
+				<div class="col-sm-2"></div>
+				<label class=" control-label col-sm-4">Carillos:</label>
+				<div class="form-check form-check-inline">
+					<div class="btn-group btn-group" data-toggle="buttons">
+        				<label class="btn" class="col-sm-2">
+         					<input type="radio" name="carillosboton"
+  								ng-model=antecedente.carillos value="Si" ng-checked="antecedente.carillos=='Si'">
+          					<i class="fa fa-circle-o fa-1x"></i><i class="fa fa-dot-circle-o fa-1x"></i> 
+          					<span> Si</span>
+        				</label>
+        				<label class="btn" class="col-sm-2">
+         					<input type="radio" name="carillosboton"
+  								ng-model=antecedente.carillos value="No" ng-checked="antecedente.carillos=='No'">
+          					<i class="fa fa-circle-o fa-1x"></i><i class="fa fa-dot-circle-o fa-1x"></i> 
+          					<span> No</span>
+        				</label>
+      				</div>
+    			</div>
+			</div>
+			<div class="col-sm-4">
+				<label class=" control-label col-sm-2">Objetivos: </label>
+				<div class="form-check form-check-inline">
+					<div class="btn-group btn-group" data-toggle="buttons">
+        				<label class="btn active" class="col-sm-2">
+         					<input type="radio" name="objetivosboton"
+  								ng-model=antecedente.objetivos value="Si" ng-checked="antecedente.objetivos=='Si'">
+          					<i class="fa fa-circle-o fa-1x"></i><i class="fa fa-dot-circle-o fa-1x"></i> 
+          					<span > Si</span>
+        				</label>
+        				<label class="btn" class="col-sm-2">
+         					<input type="radio" name="objetivosboton"
+  								ng-model=antecedente.objetivos value="No" ng-checked="antecedente.objetivos=='No'">
+          					<i class="fa fa-circle-o fa-1x"></i><i class="fa fa-dot-circle-o fa-1x"></i> 
+          					<span> No</span>
+        				</label>
+      				</div>
+    			</div>
+			</div>
+		</div>
+		
+	<div class="form-group">
+			<div class="col-sm-4">
+				<div class="col-sm-2"></div>
+				<label class=" control-label col-sm-4">Lengua:</label>
+				<div class="form-check form-check-inline">
+					<div class="btn-group btn-group" data-toggle="buttons">
+        				<label class="btn" class="col-sm-2">
+         					<input type="radio" name="lenguaboton"
+  								ng-model=antecedente.lengua value="Si" ng-checked="antecedente.lengua=='Si'">
+          					<i class="fa fa-circle-o fa-1x"></i><i class="fa fa-dot-circle-o fa-1x"></i> 
+          					<span> Si</span>
+        				</label>
+        				<label class="btn" class="col-sm-2">
+         					<input type="radio" name="lenguaboton"
+  								ng-model=antecedente.lengua value="No" ng-checked="antecedente.lengua=='No'">
+          					<i class="fa fa-circle-o fa-1x"></i><i class="fa fa-dot-circle-o fa-1x"></i> 
+          					<span> No</span>
+        				</label>
+      				</div>
+    			</div>
+			</div>
+			<div class="col-sm-4">
+				<label class="col-sm-3 control-label">Especifique:</label>
+				<div class="col-sm-5">
+					<input type="text" class="form-control">
+				</div>
+			</div>
+	</div>
+	<div class="form-group">
+			<div class="col-sm-1"></div>
+			<div class="col-sm-8">
+				<label class=" control-label">¿Le han dicho o es consiente de que rechina, aprieta y/o frota los dientes por las noches? :</label>
+				<textarea class="form-control rounded-0" rows="1"placeholder="Ingrese tratamientos previos" 
+					ng-model="antecedente.rechinado_dientes"></textarea>
+			</div>
+	</div>
+	<div class="form-group">
+			<div class="col-sm-1"></div>
+			<div class="col-sm-8">
+				<label class=" control-label">Antecedentes Familiares:</label>
+				<textarea class="form-control rounded-0" rows="1" placeholder="Ingrese antecedentes familiares" 
+					ng-model="antecedente.antecedente_familiar"/></textarea>
+			</div>
+	</div>
+</fieldset>
+<fieldset>
+	<legend><a style="font-size:">Exploración Física</a>
+		<label class="cruds" ng-click="crudExploracionFisica(1, 2)">
+			<span style="color:blue; font-size: 10pt">Actualizar Exploración</span>
+		</label>
+	</legend>
+	<div class="form-group">
+	<div class="col-sm-1"></div>
+	<div class="col-sm-10">
+				<label class=" control-label">Signos Vitales :</label>
+	</div>
+	<label class="col-sm-2 control-label">P.A:</label>
+	<div class="col-sm-2">
+		<div class="input-group">
+      			<input type="text" class="form-control" placeholder="Ingrese presion arterial" 
+      				ng-model="exploracionfisica.presion_a"/>
+    	</div>
+	</div>
+
+	<label class="col-sm-1 control-label">Pulso:</label>
+	<div class="col-sm-2">
+		<div class="input-group">
+      			<input type="text" class="form-control" placeholder="Ingrese pulso" 
+      				ng-model="exploracionfisica.pulso"/>
+    	</div>
+	</div>
+	
+	<label class="col-sm-1 control-label">Temp.:</label>
+	<div class="col-sm-2">
+		<div class="input-group">
+      			<input type="text" class="form-control" placeholder="Ingrese temperatura" 
+      				ng-model="exploracionfisica.temperatura"/>
+    	</div>
+	</div>
+	</div>
+	
+	<div class="form-group">
+	<div class="col-sm-1"></div>
+		<label class="col-sm-1 control-label">Frec. Resp.:</label>
+		<div class="col-sm-2">
+			<div class="input-group">
+      			<input type="text" class="form-control" placeholder="Ingrese frecuencia respiratoria" 
+      				ng-model="exploracionfisica.frec_resp"/>
+    		</div>
+		</div>
+	</div>
+	<div class="form-group">
+			<div class="col-sm-1"></div>
+			<div class="col-sm-8">
+				<label class=" control-label">Observaciones:</label>
+				<textarea class="form-control rounded-0" rows="1" placeholder="Ingrese observaciones" 
+      				ng-model="exploracionfisica.observacion"></textarea>
+			</div>
+	</div>
+</fieldset>
+
+		<div class="modal-footer">
+
+		</div>
+	</form>
+	</tab>
+	
+	
+	 <tab> <tab-heading ng-click="retornaOdontrograma()">
+	Odontograma <span class="badge badge-sm m-l-xs"></span> </tab-heading>
+	
+	
+		<div class="input-group">
+			<select class="form-control" ng-change="retornaOdontrograma()"
+				ng-model="pacienteodontogramadiagnosticos.idpacienteodontograma"
+				ng-options="value.idpacienteodontograma as value.descripcion  for value in lspacienteodontograma">
+				<option>--</option>
+			</select>
+			<div class="input-group-btn" dropdown>
+				<button type="button"
+					class="btn m-b-xs btn-bg btn-primary btn-addon"
+					ng-click="nuevoPacienteOdontograma('', 0, paciente.idpaciente)"
+					dropdown-toggle>
+					<span class="{{icononuevo}}"></span>
+				</button>
+
+			</div>
+		</div>
+	
+	<div class="hbox hbox-auto-xs hbox-auto-sm">
+
+	<div class="col-sm-1">
+			<div class="checkbox" ng-repeat="s in lsdiagnosticos" style="width:350px">
+				<label class="i-checks i-checks-sm {{s.color}}"> <input
+					type="radio" ng-value="{{s}}" ng-model="$parent.selectDiagnostico"
+					name="datos"> <i></i> {{s.nombre}}
+				</label>
+
+			</div>
+
+		</div>
+		
+		<div class="col-sm-10">
+			<div class="pos-rlt" >
+				<tabset class="tab-container" style="width:965px;margin:0px 0px 0px 40px;overflow-y:auto;height:500px"> <tab
+					heading="Dentición Permanente">
+				<div class="table-responsive">
+							<div class="input-group col-sm-12">
+      							<table class="table table-bordered">
+									<tr style="background:">
+										<th style="width:6.25%;height:35px"><center>{{anotacionesmuestra.d39}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d38}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d37}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d36}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d35}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d34}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d33}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d32}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d40}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d41}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d42}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d43}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d44}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d45}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d46}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d47}}</center></th>
+									</tr>
+									<tr style="background:">
+										<th style="width:6.25%;height:35px" colspan="3"><center></center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d68}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d67}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d66}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d65}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d64}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d69}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d70}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d71}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d72}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d73}}</center></th>
+										<th style="width:6.25%" colspan="3"><center></center></th>
+									</tr>
+								</table>
+    						</div>
+					<table style="border-spacing: 7px;">
+						<tbody>
+							
+							<tr>
+								
+								<td ng-repeat="a in superiorDerecho">
+									<table border="1" style="border:1px solid white" >
+										<tr>
+											<td></td>
+											<td><a
+												ng-click="seteaValor(1,a.idodontograma, a.lsPacienteodontogramadiagnosticos[1].accionesodontograma.idaccionesodontograma,selectDiagnostico.iddiagnostico)"><span
+													class="{{a.lsPacienteodontogramadiagnosticos[1].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[1].diagnostico.color:'badge colorodon dk'}}">{{a.lsPacienteodontogramadiagnosticos[1].accionesodontograma.codigo}}</span></a></td>
+											
+											<td></td>
+										</tr>
+										<tr>
+											<td><a
+												ng-click="seteaValor(1,a.idodontograma, a.lsPacienteodontogramadiagnosticos[3].accionesodontograma.idaccionesodontograma,selectDiagnostico.iddiagnostico)"><span
+													class="{{a.lsPacienteodontogramadiagnosticos[3].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[3].diagnostico.color:'badge colorodon dk'}}">{{a.lsPacienteodontogramadiagnosticos[3].accionesodontograma.codigo}}</span></a></td>
+											<td><a
+												ng-click="seteaValor(1,a.idodontograma, a.niveldientesd.numero > 3 ? a.lsPacienteodontogramadiagnosticos[4].accionesodontograma.idaccionesodontograma : a.lsPacienteodontogramadiagnosticos[10].accionesodontograma.idaccionesodontograma,selectDiagnostico.iddiagnostico)"><span
+													class="{{a.niveldientesd.numero > 3 ? (a.lsPacienteodontogramadiagnosticos[4].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[4].diagnostico.color:'badge colorodon dk'):(a.lsPacienteodontogramadiagnosticos[10].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[10].diagnostico.color:'badge colorodon dk')}}">{{a.niveldientesd.numero>3?a.lsPacienteodontogramadiagnosticos[4].accionesodontograma.codigo:a.lsPacienteodontogramadiagnosticos[10].accionesodontograma.codigo}}</span></a></td>
+											<td><a
+												ng-click="seteaValor(1,a.idodontograma, a.lsPacienteodontogramadiagnosticos[5].accionesodontograma.idaccionesodontograma,selectDiagnostico.iddiagnostico)"><span
+													class="{{a.lsPacienteodontogramadiagnosticos[5].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[5].diagnostico.color:'badge colorodon dk'}}">{{a.lsPacienteodontogramadiagnosticos[5].accionesodontograma.codigo}}</span></a></td>
+										</tr>
+										<tr>
+											<td></td>
+											<td><a
+												ng-click="seteaValor(1,a.idodontograma, a.lsPacienteodontogramadiagnosticos[7].accionesodontograma.idaccionesodontograma,selectDiagnostico.iddiagnostico)">
+													<span
+													class="{{a.lsPacienteodontogramadiagnosticos[7].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[7].diagnostico.color:'badge colorodon dk'}}"">{{a.lsPacienteodontogramadiagnosticos[7].accionesodontograma.codigo}}</span>
+											</a></td>
+											<td></td>
+										</tr>
+									</table>
+
+								</td>
+								<td class=" pos-rlt b-r b-dark"></td>
+								<td ng-repeat="a in superiorIzquierdo">
+									<table border="1" style="border:1px solid white">
+										<tr>
+											<td></td>
+											<td><a
+												ng-click="seteaValor(2,a.idodontograma, a.lsPacienteodontogramadiagnosticos[1].accionesodontograma.idaccionesodontograma,selectDiagnostico.iddiagnostico)"><span
+													class="{{a.lsPacienteodontogramadiagnosticos[1].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[1].diagnostico.color:'badge colorodon dk'}}">{{a.lsPacienteodontogramadiagnosticos[1].accionesodontograma.codigo}}</span></a></td>
+											<td></td>
+										</tr>
+										<tr>
+											<td><a
+												ng-click="seteaValor(2,a.idodontograma, a.lsPacienteodontogramadiagnosticos[5].accionesodontograma.idaccionesodontograma,selectDiagnostico.iddiagnostico)"><span
+													class="{{a.lsPacienteodontogramadiagnosticos[5].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[5].diagnostico.color:'badge colorodon dk'}}">{{a.lsPacienteodontogramadiagnosticos[5].accionesodontograma.codigo}}</span></a></td>
+
+
+											<td><a
+												ng-click="seteaValor(2,a.idodontograma, a.niveldientesd.numero > 3 ? a.lsPacienteodontogramadiagnosticos[4].accionesodontograma.idaccionesodontograma : a.lsPacienteodontogramadiagnosticos[10].accionesodontograma.idaccionesodontograma,selectDiagnostico.iddiagnostico)"><span
+													class="{{a.niveldientesd.numero > 3 ? (a.lsPacienteodontogramadiagnosticos[4].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[4].diagnostico.color:'badge colorodon dk'):(a.lsPacienteodontogramadiagnosticos[10].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[10].diagnostico.color:'badge colorodon dk')}}">{{a.niveldientesd.numero>3?a.lsPacienteodontogramadiagnosticos[4].accionesodontograma.codigo:a.lsPacienteodontogramadiagnosticos[10].accionesodontograma.codigo}}</span></a></td>
+											<td><a
+												ng-click="seteaValor(2,a.idodontograma, a.lsPacienteodontogramadiagnosticos[3].accionesodontograma.idaccionesodontograma,selectDiagnostico.iddiagnostico)"><span
+													class="{{a.lsPacienteodontogramadiagnosticos[3].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[3].diagnostico.color:'badge colorodon dk'}}">{{a.lsPacienteodontogramadiagnosticos[3].accionesodontograma.codigo}}</span></a></td>
+
+										</tr>
+										<tr>
+											<td></td>
+											<td><a
+												ng-click="seteaValor(2,a.idodontograma, a.lsPacienteodontogramadiagnosticos[7].accionesodontograma.idaccionesodontograma,selectDiagnostico.iddiagnostico)">
+													<span
+													class="{{a.lsPacienteodontogramadiagnosticos[7].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[7].diagnostico.color:'badge colorodon dk'}}"">{{a.lsPacienteodontogramadiagnosticos[7].accionesodontograma.codigo}}</span>
+											</a></td>
+											<td></td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+							<tr>
+
+								<td style="text-align: center !important;"
+									ng-repeat="a in superiorDerecho"><img height="80" class="imagendiente"
+									src="img/dental/superiorDerecho/{{a.img}}" 
+									ng-click="crudPacienteodontogramanotaciones(a.idodontograma,pacienteodontogramadiagnosticos.idpacienteodontograma,anotaciones.idanotacionesodontograma)"/></td>
+								<td class=" pos-rlt b-r b-dark"></td>
+								<td style="text-align: center !important;"
+									ng-repeat="a in superiorIzquierdo"><img height="80" class="imagendiente"
+									src="img/dental/superiorIzquierdo/{{a.img}}" 
+									ng-click="crudPacienteodontogramanotaciones(a.idodontograma,pacienteodontogramadiagnosticos.idpacienteodontograma,anotaciones.idanotacionesodontograma)"/><span class="input-group-btn">
+
+								</span></td>
+							</tr>
+							<tr>
+								<td style="text-align: center !important;"
+									ng-repeat="b in superiorDerecho"><span
+									class="text-center-xs">{{b.niveldientepd.numero}}.
+										{{b.niveldientesd.numero}}</span></td>
+								<td class=" pos-rlt b-r b-dark"></td>
+								<td style="text-align: center !important;"
+									ng-repeat="b in superiorIzquierdo"><span
+									class="text-center-xs">{{b.niveldientepd.numero}}.
+										{{b.niveldientesd.numero}}</span></td>
+							</tr>
+							
+							<tr>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td ng-repeat="a in superiorDerechob">
+									<table border="0">
+										<tr>
+											<td></td>
+											<td><a
+												ng-click="seteaValor(5,a.idodontograma, a.lsPacienteodontogramadiagnosticos[1].accionesodontograma.idaccionesodontograma,selectDiagnostico.iddiagnostico)"><span
+													class="{{a.lsPacienteodontogramadiagnosticos[1].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[1].diagnostico.color:'badge colorodon dk'}}">{{a.lsPacienteodontogramadiagnosticos[1].accionesodontograma.codigo}}</span></a></td>
+											<td></td>
+										</tr>
+										<tr>
+											<td><a
+												ng-click="seteaValor(5,a.idodontograma, a.lsPacienteodontogramadiagnosticos[3].accionesodontograma.idaccionesodontograma,selectDiagnostico.iddiagnostico)"><span
+													class="{{a.lsPacienteodontogramadiagnosticos[3].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[3].diagnostico.color:'badge colorodon dk'}}">{{a.lsPacienteodontogramadiagnosticos[3].accionesodontograma.codigo}}</span></a></td>
+											<td><a
+												ng-click="seteaValor(5,a.idodontograma, a.niveldientesd.numero > 3 ? a.lsPacienteodontogramadiagnosticos[4].accionesodontograma.idaccionesodontograma : a.lsPacienteodontogramadiagnosticos[10].accionesodontograma.idaccionesodontograma,selectDiagnostico.iddiagnostico)"><span
+													class="{{a.niveldientesd.numero > 3 ? (a.lsPacienteodontogramadiagnosticos[4].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[4].diagnostico.color:'badge colorodon dk'):(a.lsPacienteodontogramadiagnosticos[10].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[10].diagnostico.color:'badge colorodon dk')}}">{{a.niveldientesd.numero>3?a.lsPacienteodontogramadiagnosticos[4].accionesodontograma.codigo:a.lsPacienteodontogramadiagnosticos[10].accionesodontograma.codigo}}</span></a></td>
+											<td><a
+												ng-click="seteaValor(5,a.idodontograma, a.lsPacienteodontogramadiagnosticos[5].accionesodontograma.idaccionesodontograma,selectDiagnostico.iddiagnostico)"><span
+													class="{{a.lsPacienteodontogramadiagnosticos[5].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[5].diagnostico.color:'badge colorodon dk'}}">{{a.lsPacienteodontogramadiagnosticos[5].accionesodontograma.codigo}}</span></a></td>
+										</tr>
+										<tr>
+											<td></td>
+											<td><a
+												ng-click="seteaValor(5,a.idodontograma, a.lsPacienteodontogramadiagnosticos[7].accionesodontograma.idaccionesodontograma,selectDiagnostico.iddiagnostico)">
+													<span
+													class="{{a.lsPacienteodontogramadiagnosticos[7].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[7].diagnostico.color:'badge colorodon dk'}}"">{{a.lsPacienteodontogramadiagnosticos[7].accionesodontograma.codigo}}</span>
+											</a></td>
+											<td></td>
+										</tr>
+									</table>
+
+								</td>
+								<td class=" pos-rlt b-r b-dark"></td>
+								<td ng-repeat="a in superiorIzquierdob">
+									<table border="0">
+										<tr>
+											<td></td>
+											<td><a
+												ng-click="seteaValor(6,a.idodontograma, a.lsPacienteodontogramadiagnosticos[1].accionesodontograma.idaccionesodontograma,selectDiagnostico.iddiagnostico)"><span
+													class="{{a.lsPacienteodontogramadiagnosticos[1].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[1].diagnostico.color:'badge colorodon dk'}}">{{a.lsPacienteodontogramadiagnosticos[1].accionesodontograma.codigo}}</span></a></td>
+											<td></td>
+										</tr>
+										<tr>
+											<td><a
+												ng-click="seteaValor(6,a.idodontograma, a.lsPacienteodontogramadiagnosticos[5].accionesodontograma.idaccionesodontograma,selectDiagnostico.iddiagnostico)"><span
+													class="{{a.lsPacienteodontogramadiagnosticos[5].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[5].diagnostico.color:'badge colorodon dk'}}">{{a.lsPacienteodontogramadiagnosticos[5].accionesodontograma.codigo}}</span></a></td>
+
+											<td><a
+												ng-click="seteaValor(6,a.idodontograma, a.niveldientesd.numero > 3 ? a.lsPacienteodontogramadiagnosticos[4].accionesodontograma.idaccionesodontograma : a.lsPacienteodontogramadiagnosticos[10].accionesodontograma.idaccionesodontograma,selectDiagnostico.iddiagnostico)"><span
+													class="{{a.niveldientesd.numero > 3 ? (a.lsPacienteodontogramadiagnosticos[4].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[4].diagnostico.color:'badge colorodon dk'):(a.lsPacienteodontogramadiagnosticos[10].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[10].diagnostico.color:'badge colorodon dk')}}">{{a.niveldientesd.numero>3?a.lsPacienteodontogramadiagnosticos[4].accionesodontograma.codigo:a.lsPacienteodontogramadiagnosticos[10].accionesodontograma.codigo}}</span></a></td>
+											<td><a
+												ng-click="seteaValor(6,a.idodontograma, a.lsPacienteodontogramadiagnosticos[3].accionesodontograma.idaccionesodontograma,selectDiagnostico.iddiagnostico)"><span
+													class="{{a.lsPacienteodontogramadiagnosticos[3].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[3].diagnostico.color:'badge colorodon dk'}}">{{a.lsPacienteodontogramadiagnosticos[3].accionesodontograma.codigo}}</span></a></td>
+
+										</tr>
+										<tr>
+											<td></td>
+											<td><a
+												ng-click="seteaValor(6,a.idodontograma, a.lsPacienteodontogramadiagnosticos[7].accionesodontograma.idaccionesodontograma,selectDiagnostico.iddiagnostico)">
+													<span
+													class="{{a.lsPacienteodontogramadiagnosticos[7].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[7].diagnostico.color:'badge colorodon dk'}}"">{{a.lsPacienteodontogramadiagnosticos[7].accionesodontograma.codigo}}</span>
+											</a></td>
+											<td></td>
+										</tr>
+									</table>
+								</td>
+
+							</tr>
+							
+							<tr>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td style="text-align: center !important;"
+									ng-repeat="a in superiorDerechob"><img height="80" class="imagendiente"
+									src="img/dental/superiorDerechob/{{a.img}}"
+									ng-click="crudPacienteodontogramanotaciones(a.idodontograma,pacienteodontogramadiagnosticos.idpacienteodontograma,anotaciones.idanotacionesodontograma)" /></td>
+								<td class=" pos-rlt b-r b-dark"></td>
+								<td style="text-align: center !important;"
+									ng-repeat="a in superiorIzquierdob"><img height="80" class="imagendiente"
+									src="img/dental/superiorIzquierdob/{{a.img}}" 
+									ng-click="crudPacienteodontogramanotaciones(a.idodontograma,pacienteodontogramadiagnosticos.idpacienteodontograma,anotaciones.idanotacionesodontograma)"/></td>
+
+							</tr>
+							<tr>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td style="text-align: center !important;"
+									ng-repeat="b in superiorDerechob"><span
+									class="text-center-xs"> {{b.niveldientepd.numero}}.
+										{{b.niveldientesd.numero}}</span></td>
+								<td class=" pos-rlt b-r b-dark"></td>
+								<td style="text-align: center !important;"
+									ng-repeat="b in superiorIzquierdob"><span
+									class="text-center-xs">{{b.niveldientepd.numero}}.
+										{{b.niveldientesd.numero}}</span></td>
+
+							</tr>	
+							<tr>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td class=" pos-rlt b-b b-dark" ng-repeat="a in inferiorDerechob"></td>
+								<td class=" pos-rlt b-b b-dark" ng-repeat="a in inferiorIzquierdob"></td>
+								<td class=" pos-rlt b-b b-dark"></td>
+							</tr>
+							
+							
+							<tr>
+							<td></td>
+								<td></td>
+								<td></td>
+
+								<td style="text-align: center !important;"
+									ng-repeat="b in inferiorDerechob"><span
+									class="text-center-xs"> {{b.niveldientepd.numero}}.
+										{{b.niveldientesd.numero}}</span></td>
+								<td class=" pos-rlt b-r b-dark"></td>
+								<td style="text-align: center !important;"
+									ng-repeat="b in inferiorIzquierdob"><span
+									class="text-center-xs">{{b.niveldientepd.numero}}.
+										{{b.niveldientesd.numero}}</span></td>
+
+							</tr>
+
+							<tr>
+							<td></td>
+								<td></td>
+								<td></td>
+
+								<td style="text-align: center !important;"
+									ng-repeat="a in inferiorDerechob"><img height="80" class="imagendiente"
+									src="img/dental/inferiorDerechob/{{a.img}}" 
+									ng-click="crudPacienteodontogramanotaciones(a.idodontograma,pacienteodontogramadiagnosticos.idpacienteodontograma,anotaciones.idanotacionesodontograma)"/></td>
+								<td class=" pos-rlt b-r b-dark"></td>
+								<td style="text-align: center !important;"
+									ng-repeat="a in inferiorIzquierdob"><img height="80" class="imagendiente"
+									src="img/dental/inferiorIzquierdob/{{a.img}}" 
+									ng-click="crudPacienteodontogramanotaciones(a.idodontograma,pacienteodontogramadiagnosticos.idpacienteodontograma,anotaciones.idanotacionesodontograma)"/></td>
+
+							</tr>
+							
+							<tr>
+								<td></td>
+								<td></td>
+								<td></td>
+
+								<td ng-repeat="a in inferiorDerechob">
+									<table border="0">
+										<tr>
+											<td></td>
+											<td><a
+												ng-click="seteaValor(8,a.idodontograma, a.lsPacienteodontogramadiagnosticos[9].accionesodontograma.idaccionesodontograma,selectDiagnostico.iddiagnostico)"><span
+													class="{{a.lsPacienteodontogramadiagnosticos[9].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[9].diagnostico.color:'badge colorodon dk'}}">{{a.lsPacienteodontogramadiagnosticos[9].accionesodontograma.codigo}}</span></a></td>
+											<td></td>
+										</tr>
+										<tr>
+											<td><a
+												ng-click="seteaValor(8,a.idodontograma, a.lsPacienteodontogramadiagnosticos[3].accionesodontograma.idaccionesodontograma,selectDiagnostico.iddiagnostico)"><span
+													class="{{a.lsPacienteodontogramadiagnosticos[3].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[3].diagnostico.color:'badge colorodon dk'}}">{{a.lsPacienteodontogramadiagnosticos[3].accionesodontograma.codigo}}</span></a></td>
+											<td><a
+												ng-click="seteaValor(8,a.idodontograma, a.niveldientesd.numero > 3 ? a.lsPacienteodontogramadiagnosticos[4].accionesodontograma.idaccionesodontograma : a.lsPacienteodontogramadiagnosticos[10].accionesodontograma.idaccionesodontograma,selectDiagnostico.iddiagnostico)"><span
+													class="{{a.niveldientesd.numero > 3 ? (a.lsPacienteodontogramadiagnosticos[4].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[4].diagnostico.color:'badge colorodon dk'):(a.lsPacienteodontogramadiagnosticos[10].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[10].diagnostico.color:'badge colorodon dk')}}">{{a.niveldientesd.numero>3?a.lsPacienteodontogramadiagnosticos[4].accionesodontograma.codigo:a.lsPacienteodontogramadiagnosticos[10].accionesodontograma.codigo}}</span></a></td>
+											<td><a
+												ng-click="seteaValor(8,a.idodontograma, a.lsPacienteodontogramadiagnosticos[5].accionesodontograma.idaccionesodontograma,selectDiagnostico.iddiagnostico)"><span
+													class="{{a.lsPacienteodontogramadiagnosticos[5].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[5].diagnostico.color:'badge colorodon dk'}}">{{a.lsPacienteodontogramadiagnosticos[5].accionesodontograma.codigo}}</span></a></td>
+										</tr>
+										<tr>
+											<td></td>
+											<td><a
+												ng-click="seteaValor(8,a.idodontograma, a.lsPacienteodontogramadiagnosticos[1].accionesodontograma.idaccionesodontograma,selectDiagnostico.iddiagnostico)">
+													<span
+													class="{{a.lsPacienteodontogramadiagnosticos[1].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[1].diagnostico.color:'badge colorodon dk'}}"">{{a.lsPacienteodontogramadiagnosticos[1].accionesodontograma.codigo}}</span>
+											</a></td>
+											<td></td>
+										</tr>
+									</table>
+
+								</td>
+								<td class=" pos-rlt b-r b-dark"></td>
+								<td ng-repeat="a in inferiorIzquierdob">
+									<table border="0">
+										<tr>
+											<td></td>
+											<td><a
+												ng-click="seteaValor(7,a.idodontograma, a.lsPacienteodontogramadiagnosticos[9].accionesodontograma.idaccionesodontograma,selectDiagnostico.iddiagnostico)"><span
+													class="{{a.lsPacienteodontogramadiagnosticos[9].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[9].diagnostico.color:'badge colorodon dk'}}">{{a.lsPacienteodontogramadiagnosticos[9].accionesodontograma.codigo}}</span></a></td>
+											<td></td>
+										</tr>
+										<tr>
+											<td><a
+												ng-click="seteaValor(7,a.idodontograma, a.lsPacienteodontogramadiagnosticos[5].accionesodontograma.idaccionesodontograma,selectDiagnostico.iddiagnostico)"><span
+													class="{{a.lsPacienteodontogramadiagnosticos[5].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[5].diagnostico.color:'badge colorodon dk'}}">{{a.lsPacienteodontogramadiagnosticos[5].accionesodontograma.codigo}}</span></a></td>
+
+											<td><a
+												ng-click="seteaValor(7,a.idodontograma, a.niveldientesd.numero > 3 ? a.lsPacienteodontogramadiagnosticos[4].accionesodontograma.idaccionesodontograma : a.lsPacienteodontogramadiagnosticos[10].accionesodontograma.idaccionesodontograma,selectDiagnostico.iddiagnostico)"><span
+													class="{{a.niveldientesd.numero > 3 ? (a.lsPacienteodontogramadiagnosticos[4].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[4].diagnostico.color:'badge colorodon dk'):(a.lsPacienteodontogramadiagnosticos[10].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[10].diagnostico.color:'badge colorodon dk')}}">{{a.niveldientesd.numero>3?a.lsPacienteodontogramadiagnosticos[4].accionesodontograma.codigo:a.lsPacienteodontogramadiagnosticos[10].accionesodontograma.codigo}}</span></a></td>
+											<td><a
+												ng-click="seteaValor(7,a.idodontograma, a.lsPacienteodontogramadiagnosticos[3].accionesodontograma.idaccionesodontograma,selectDiagnostico.iddiagnostico)"><span
+													class="{{a.lsPacienteodontogramadiagnosticos[3].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[3].diagnostico.color:'badge colorodon dk'}}">{{a.lsPacienteodontogramadiagnosticos[3].accionesodontograma.codigo}}</span></a></td>
+
+										</tr>
+										<tr>
+											<td></td>
+											<td><a
+												ng-click="seteaValor(7,a.idodontograma, a.lsPacienteodontogramadiagnosticos[1].accionesodontograma.idaccionesodontograma,selectDiagnostico.iddiagnostico)">
+													<span
+													class="{{a.lsPacienteodontogramadiagnosticos[1].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[1].diagnostico.color:'badge colorodon dk'}}"">{{a.lsPacienteodontogramadiagnosticos[1].accionesodontograma.codigo}}</span>
+											</a></td>
+											<td></td>
+										</tr>
+									</table>
+								</td>
+
+							</tr>
+
+
+							<tr>
+								<td style="text-align: center !important;"
+									ng-repeat="b in inferiorDerecho"><span
+									class="text-center-xs"> {{b.niveldientepd.numero}}.
+										{{b.niveldientesd.numero}}</span></td>
+								<td class=" pos-rlt b-r b-dark"></td>
+								<td style="text-align: center !important;"
+									ng-repeat="b in inferiorIzquierdo"><span
+									class="text-center-xs">{{b.niveldientepd.numero}}.
+										{{b.niveldientesd.numero}}</span></td>
+							</tr>
+							<tr>
+								<td ng-repeat="a in inferiorDerecho"><img height="80" class="imagendiente"
+									src="img/dental/inferiorDerecho/{{a.img}}" 
+									ng-click="crudPacienteodontogramanotaciones(a.idodontograma,pacienteodontogramadiagnosticos.idpacienteodontograma,anotaciones.idanotacionesodontograma)"/></td>
+								<td class=" pos-rlt b-r b-dark"></td>
+								<td ng-repeat="a in inferiorIzquierdo"><img height="80" class="imagendiente"
+									src="img/dental/inferiorIzquierdo/{{a.img}}" 
+									ng-click="crudPacienteodontogramanotaciones(a.idodontograma,pacienteodontogramadiagnosticos.idpacienteodontograma,anotaciones.idanotacionesodontograma)"/></td>
+							</tr>
+							
+							<tr>
+								<td ng-repeat="a in inferiorDerecho">
+									<table border="0">
+										<tr>
+											<td></td>
+											<td><a
+												ng-click="seteaValor(4,a.idodontograma, a.lsPacienteodontogramadiagnosticos[9].accionesodontograma.idaccionesodontograma,selectDiagnostico.iddiagnostico)"><span
+													class="{{a.lsPacienteodontogramadiagnosticos[9].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[9].diagnostico.color:'badge colorodon dk'}}">{{a.lsPacienteodontogramadiagnosticos[9].accionesodontograma.codigo}}</span></a></td>
+											<td></td>
+										</tr>
+										<tr>
+											<td><a
+												ng-click="seteaValor(4,a.idodontograma, a.lsPacienteodontogramadiagnosticos[3].accionesodontograma.idaccionesodontograma,selectDiagnostico.iddiagnostico)"><span
+													class="{{a.lsPacienteodontogramadiagnosticos[3].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[3].diagnostico.color:'badge colorodon dk'}}">{{a.lsPacienteodontogramadiagnosticos[3].accionesodontograma.codigo}}</span></a></td>
+											<td><a
+												ng-click="seteaValor(4,a.idodontograma, a.niveldientesd.numero > 3 ? a.lsPacienteodontogramadiagnosticos[4].accionesodontograma.idaccionesodontograma : a.lsPacienteodontogramadiagnosticos[10].accionesodontograma.idaccionesodontograma,selectDiagnostico.iddiagnostico)"><span
+													class="{{a.niveldientesd.numero > 3 ? (a.lsPacienteodontogramadiagnosticos[4].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[4].diagnostico.color:'badge colorodon dk'):(a.lsPacienteodontogramadiagnosticos[10].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[10].diagnostico.color:'badge colorodon dk')}}">{{a.niveldientesd.numero>3?a.lsPacienteodontogramadiagnosticos[4].accionesodontograma.codigo:a.lsPacienteodontogramadiagnosticos[10].accionesodontograma.codigo}}</span></a></td>
+											<td><a
+												ng-click="seteaValor(4,a.idodontograma, a.lsPacienteodontogramadiagnosticos[5].accionesodontograma.idaccionesodontograma,selectDiagnostico.iddiagnostico)"><span
+													class="{{a.lsPacienteodontogramadiagnosticos[5].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[5].diagnostico.color:'badge colorodon dk'}}">{{a.lsPacienteodontogramadiagnosticos[5].accionesodontograma.codigo}}</span></a></td>
+										</tr>
+										<tr>
+											<td></td>
+											<td><a
+												ng-click="seteaValor(4,a.idodontograma, a.lsPacienteodontogramadiagnosticos[1].accionesodontograma.idaccionesodontograma,selectDiagnostico.iddiagnostico)">
+													<span
+													class="{{a.lsPacienteodontogramadiagnosticos[1].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[1].diagnostico.color:'badge colorodon dk'}}"">{{a.lsPacienteodontogramadiagnosticos[1].accionesodontograma.codigo}}</span>
+											</a></td>
+											<td></td>
+										</tr>
+									</table>
+
+								</td>
+								<td class=" pos-rlt b-r b-dark"></td>
+								<td ng-repeat="a in inferiorIzquierdo">
+									<table border="0">
+										<tr>
+											<td></td>
+											<td><a
+												ng-click="seteaValor(3,a.idodontograma, a.lsPacienteodontogramadiagnosticos[9].accionesodontograma.idaccionesodontograma,selectDiagnostico.iddiagnostico)"><span
+													class="{{a.lsPacienteodontogramadiagnosticos[9].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[9].diagnostico.color:'badge colorodon dk'}}">{{a.lsPacienteodontogramadiagnosticos[9].accionesodontograma.codigo}}</span></a></td>
+											<td></td>
+										</tr>
+										<tr>
+											<td><a
+												ng-click="seteaValor(3,a.idodontograma, a.lsPacienteodontogramadiagnosticos[5].accionesodontograma.idaccionesodontograma,selectDiagnostico.iddiagnostico)"><span
+													class="{{a.lsPacienteodontogramadiagnosticos[5].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[5].diagnostico.color:'badge colorodon dk'}}">{{a.lsPacienteodontogramadiagnosticos[5].accionesodontograma.codigo}}</span></a></td>
+											<td><a
+												ng-click="seteaValor(3,a.idodontograma, a.niveldientesd.numero > 3 ? a.lsPacienteodontogramadiagnosticos[4].accionesodontograma.idaccionesodontograma : a.lsPacienteodontogramadiagnosticos[10].accionesodontograma.idaccionesodontograma,selectDiagnostico.iddiagnostico)"><span
+													class="{{a.niveldientesd.numero > 3 ? (a.lsPacienteodontogramadiagnosticos[4].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[4].diagnostico.color:'badge colorodon dk'):(a.lsPacienteodontogramadiagnosticos[10].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[10].diagnostico.color:'badge colorodon dk')}}">{{a.niveldientesd.numero>3?a.lsPacienteodontogramadiagnosticos[4].accionesodontograma.codigo:a.lsPacienteodontogramadiagnosticos[10].accionesodontograma.codigo}}</span></a></td>
+											<td><a
+												ng-click="seteaValor(3,a.idodontograma, a.lsPacienteodontogramadiagnosticos[3].accionesodontograma.idaccionesodontograma,selectDiagnostico.iddiagnostico)"><span
+													class="{{a.lsPacienteodontogramadiagnosticos[3].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[3].diagnostico.color:'badge colorodon dk'}}">{{a.lsPacienteodontogramadiagnosticos[3].accionesodontograma.codigo}}</span></a></td>
+										</tr>
+										<tr>
+											<td></td>
+											<td><a
+												ng-click="seteaValor(3,a.idodontograma, a.lsPacienteodontogramadiagnosticos[1].accionesodontograma.idaccionesodontograma,selectDiagnostico.iddiagnostico)">
+													<span
+													class="{{a.lsPacienteodontogramadiagnosticos[1].diagnostico.color!=undefined?a.lsPacienteodontogramadiagnosticos[1].diagnostico.color:'badge colorodon dk'}}"">{{a.lsPacienteodontogramadiagnosticos[1].accionesodontograma.codigo}}</span>
+											</a></td>
+											<td></td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<br><br>
+					<div class="input-group col-sm-12">
+      							<table class="table table-bordered">
+      							<tr style="background:">
+										<th style="width:6.25%;height:35px" colspan="3"><center></center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d83}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d82}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d81}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d80}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d79}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d74}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d75}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d76}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d77}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d78}}</center></th>
+										<th style="width:6.25%" colspan="3"><center></center></th>
+									</tr>
+									<tr style="background:">
+										<th style="width:6.25%;height:35px"><center>{{anotacionesmuestra.d63}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d62}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d61}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d60}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d59}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d58}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d57}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d56}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d48}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d49}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d50}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d51}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d52}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d53}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d54}}</center></th>
+										<th style="width:6.25%"><center>{{anotacionesmuestra.d55}}</center></th>
+									</tr>
+								</table>
+    						</div>
+				</div>
+				</tab>
+				</tabset>
+
+
+			</div>
+			<div class="col-sm-10">
+				<div class="form-group">
+					<div class="col-sm-8">
+						<label class=" control-label">Observaciones :</label>
+						<textarea class="form-control rounded-0" rows="1"></textarea>
+					</div>
+				</div>
+				<br><br><br>
+			</div>
+			<div class="col-sm-10">
+				<div class="form-group">
+					<fieldset>
+					<legend>Diagnostico (CIE 10)</legend>
+					
+						<div class="col-sm-10">
+						<div class="col-sm-2"></div>
+						<div class="col-sm-9">
+						<label class=" control-label">Diagnostico Presuntivo :</label>
+						<textarea class="form-control rounded-0" rows="1"></textarea>
+						</div>
+						</div>
+						<div class="col-sm-10">
+						<div class="col-sm-2"></div>
+						<div class="col-sm-9">
+						<label class=" control-label">Examenes Auxiliares :</label>
+						<textarea class="form-control rounded-0" rows="1"></textarea>
+						</div>
+						</div>
+					</fieldset>
+					
+				</div>
+			</div>
+
+	</div>
+	<div class="col-sm-1">
+			<div class="checkbox" ng-repeat="anotaciones in lsanotaciones">
+				<label class="i-checks i-checks-sm badge bg-primary"> <input name="anotaciones"
+					type="radio" ng-value="{{anotaciones}}" ng-model="$parent.anotaciones" 
+					 > <i></i> {{anotaciones.abreviacion}}
+				</label>
+			</div>
+
+		</div>
+	</div>
+	
+	</tab> 
+	
+	
+	
+	 
+	
+	
+	
+	<tab ng-init="diagnosticocie = false; diagnostico = true; tratamiento = true"> <tab-heading>Diagnostico<span
+		class="badge badge-sm m-l-xs"></span> </tab-heading>
+		<form  ng-hide="" name="formValidateDatGen" class="form-horizontal form-validation">
+			<div class="hbox hbox-auto-xs hbox-auto-sm">
+		<div class="col-sm-2" style="background:; margin:90px 0 ">
+		<ul class="nav nav-pills nav-stacked colorletra">
+			<li class="{{diagnosticocie == false?'active':''}}"><a ng-click="diagnosticocie = false; diagnostico = true; tratamiento = true">Diagnostico CIE</a></li>
+			<li class="{{diagnostico == false?'active':''}}"><a ng-click="diagnostico = false; tratamiento = true; diagnosticocie = true">Diagnostico Definitivo</a></li>
+			<li class="{{tratamiento == false?'active':''}}"><a ng-click="tratamiento = false; diagnostico = true; diagnosticocie = true">Tratamiento</a></li>
+		</ul>
+		</div>
+		<div class="col-sm-10" style="background:" ng-hide="diagnosticocie">
+		<div class="container col-sm-10 col-sm-offset-1">
+		<fieldset>
+		<legend>Diagnostico (CIE 10)
+		<button type="submit" ng-disabled="formValidateDatGen.$invalid"
+				class="btn btn-sm btn-success btn-addon" style="float:right;margin:5px 0"
+				tooltip="guardar">
+				<i class="glyphicon glyphicon-floppy-disk"></i>Guardar Diagnostico
+			</button></legend>
+		<div class="form-group">
+			<div class="col-sm-8">
+				<label class=" control-label">Diagnostico Presuntivo:</label>
+			<div class="form-group">
+				<div class="col-sm-8">
+					   	<div class="input-group">
+							<select  class="form-control">
+							<ng-options>  
+					 			<option>--</option>
+							</select>
+ 								<span class="input-group-btn">
+ 								<button
+										style="height:34px"
+										type="button"
+										class="btn btn-xs btn-icon btn-info  ">
+										<i class="icon icon-plus"></i>
+									</button>
+								</span>
+							</div>	 
+				 	</div>
+			</div>
+			</div>
+		</div>
+		<div class="table" style="margin:20px 0">
+			<table ng-table="" export-csv="csv" class="table table-bordered">
+				<tr style="background:#D6FFF8">
+					<th><center>CIE 10</center></th>
+				</tr>
+				<tr class="center" ng-repeat="cat in $data">
+					<td data-title="'CIE 10'" sortable="CIE 10" style="width:20%"></td>	
+				 
+				</tr>
+			</table>
+		</div>
+		</fieldset>
+		</div>
+		</div>
+		<div class="col-sm-10" style="background:" ng-hide="diagnostico">
+		<div class="container col-sm-10 col-sm-offset-1">
+		<fieldset><legend>Diagnostico Definitivo</legend>
+		<div class="row wrapper">
+		<div class="col-sm-7">
+			<button type="button" tooltip-placement="right"
+				tooltip="{{nuevoregistro}}"
+				class="btn m-b-xs btn-sm btn-primary btn-addon" ng-click="agregadiagnostico()">
+					<i class="{{icononuevo}}"></i>Agregar Diagnostico
+			</button>
+		</div>
+	</div>
+		<div class="table">
+			<table ng-table="" class="table table-bordered">
+				<tr style="background:#D6FFF8">
+					<th><center>Diagnostico Definitivo</center></th>
+					<th><center>Tratamiento</center></th>
+					<th></th>
+				</tr>
+				<tr class="center" ng-repeat="cat in lsdiagno">
+					<td data-title="'Fecha'" class="border-bottom" sortable="Fecha" style="width:20%">{{cat.nombre}}</td>
+					<td style="width:20%">
+					<ui-select ng-model="diagnostico.serviciotmp" ng-disabled="cat.bloql" theme="bootstrap" ng-change="seteaservici(diagnostico.serviciotmp,$index)"
+							style="min-width: 300px;"> <ui-select-match
+							placeholder="Seleccione un servicio de la lista">
+							{{$select.selected.nombre}}</ui-select-match>
+						<ui-select-choices
+							repeat="serv in servicios | propsFilter: {nombre: $select.search}">
+						<small>
+					 	<span ng-bind-html="serv.nombre | highlight: $select.search"></span>
+						</small> 
+						</ui-select-choices> 
+					</ui-select>
+					</td>
+					<td style="width:10%">
+					 <button style="height:34px" type="button" ng-click="agregarservi($index)" ng-disabled="cat.bloq"
+										class="btn btn-xs btn-icon btn-info">
+										<i class="icon icon-plus"></i>
+							</button>
+					</td>				 
+				</tr> 
+			</table>      
+		</div>
+		<div class="form-group">
+			<div class="col-sm-8">
+				<label class=" control-label">Pronostico:</label>
+				<textarea class="form-control rounded-0" rows="2"></textarea>
+			</div>
+		<div class="col-sm-4" style="background:">
+		 <button type="submit" ng-disabled="formValidateDatGen.$invalid"
+				ng-click="" class="btn btn-sm btn-success btn-addon"
+				tooltip-placement="right" style="margin:40px 30px"
+				tooltip="guardar">
+				<i class="glyphicon glyphicon-floppy-disk"></i>Guardar Diagnostico
+			</button>
+		</div>
+		</div>
+		</fieldset>
+		</div>
+		</div>
+		<div class="col-sm-10" style="background:" ng-hide="tratamiento">
+		<div class="container col-sm-10 col-sm-offset-1">
+		<fieldset><legend>Tratamiento</legend>
+		<div class="row wrapper">
+		<div class="col-sm-7">
+			<button type="button" tooltip-placement="right"
+				tooltip="{{nuevoregistro}}"
+				class="btn m-b-xs btn-sm btn-primary btn-addon" ng-click="selcctratamiento()">
+					<i class="{{icononuevo}}"></i>Seleccionar Tratamiento
+			</button>
+		</div>
+	</div>
+  		<div class="table ">
+			<table ng-table="tableParamsTratamiento" export-csv="csv"  class="table table-bordered">
+				<tr style="background:#D6FFF8">
+			   		<th colspan="2"><center>Nombre Tratamiento</center></th>
+					<th style="width:"><center>Doctor</center></th>
+					<th style="width:"><center>Fecha</center></th>
+					<th style="width:"><center>Total</center></th>
+				</tr>
+				<tr class="center" ng-repeat-start="cat in $data">
+					<td style="width: 1%;">
+						<a ng-if="cat.expanded" ng-click="cat.expanded = false">
+							<i class="fa fa-minus-square"></i>
+							</a>
+						<a ng-if="!cat.expanded" ng-click="cat.expanded = true">
+							<i class="fa fa-plus-square"></i>
+							</a>
+					</td>
+					<td data-title="'Nombre Tratamiento'" sortable="nro tratamiento"  style="width:170px">
+						{{cat.nombretratamiento}}</td>
+					<td data-title="'Doctor'" sortable="nrotratamiento"  style="width:170px">
+						{{cat.doctor.nombres}}</td>
+					<td data-title="'Fecha'" sortable="fecha"  style="width:110px">
+						<center>{{cat.fecharegistro | date:'dd-MM-yyyy'}}</center></td>
+					<td data-title="'Total'" sortable="total"  style="width:80px">
+						<center>{{cat.total}}</center></td>
+				</tr>
+			 
+				<tr ng-if="cat.expanded" ng-repeat-end="cat in $data"> 
+								<td colspan="12">
+								<tabset class="tab-container">  <tab
+										heading="Detalle" > 
+									<div class="panel-body">
+									<div class="table-responsive">
+										<table st-table="cat.lsdetalle" st-pipe="callServer"
+											class="table table-striped b-t b-light">
+											<thead>
+												<tr>
+													<th st-sort="cat.nombre">Servicio</th>
+													<th st-sort="cat.tiempoduracion">Duracion</th>
+													<th st-sort="cat.precio">Precio</th>
+													<th></th>
+												</tr>
+											</thead>
+											<tbody ng-hide="isLoading">
+												<tr ng-repeat="a in cat.lsdetalle">
+													<td>{{a.servicio.descripcion}}</td>
+													<td>{{a.servicio.tiempoduracion}}</td>
+													<td>{{a.servicio.precio}}</td>
+												</tr>
+											</tbody>
+										</table>
+								</div>
+									
+									</div>
+									</tab>
+									<tab
+										heading="Insumos"> 
+									<div class="panel-body">
+									<div class="table-responsive">
+										<table st-table="a" st-pipe="callServer"
+											class="table table-striped b-t b-light">
+											<thead>
+												<tr>
+													<th st-sort="cat.nombre">Insumo</th>
+													<th st-sort="cat.tiempoduracion">Cantidad total</th>
+													<th st-sort="cat.precio">Unidad</th>
+													<th></th>
+												</tr>
+											</thead>
+											<tbody ng-hide="isLoading">
+												<tr ng-repeat="b in lsdetinsu">
+													<td>{{b.descripcion}}</td>
+													<td>{{b.cantidad}}</td>
+													<td>{{b.unidad}}</td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+								</div>
+							</tab>
+						</tabset>
+					</td>
+				</tr>
+			</table>
+		</div>
+		</fieldset>
+		</div>
+		</div>
+		</div>
+		</form>
+	</tab>
+	<tab ng-init="descuento = false; pago = true; fichapago = true"> <tab-heading> Presupuesto <span
+		class="badge badge-sm m-l-xs"></span> </tab-heading>
+		<form name="formValidateDatGen" class="form-horizontal form-validation">
+		<div class="hbox hbox-auto-xs hbox-auto-sm">
+		<div class="col-sm-2" style="background:; margin:90px 0 ">
+		<ul class="nav nav-pills nav-stacked colorletra">
+			<li class="{{descuento == false?'active':''}}"><a ng-click="descuento = false; pago = true; fichapago = true">Descuentos</a></li>
+			<li class="{{pago == false?'active':''}}"><a ng-click="pago = false; descuento = true; fichapago = true">Pagos</a></li>
+			<li class="{{fichapago == false?'active':''}}"><a ng-click="fichapago =false; descuento = true; pago = true">Ficha de Pagos</a></li>
+		</ul>
+		</div>
+		<div class="col-sm-10" style="background:" ng-hide="descuento">
+		<div class="container col-sm-10 col-sm-offset-1">
+		<fieldset><legend>Descuento</legend>
+			<div class="row wrapper">
+		</div>
+		<div class="table">
+			<table ng-table="tableParamsPresupuesto" export-csv="csv" class="table table-bordered">
+				<tr style="background:#D6FFF8">
+					<th><center>Nro</center></th>
+					<th><center>Doctor</center></th>
+					<th><center>Fecha</center></th>
+					<th><center>Total Tratamiento</center></th>
+					<th><center>Total Abonos</center></th>
+					<th><center>Saldo Pendiente</center></th>
+					<th><center>Estado</center></th>
+					<th colspan="2"><center>Acción</center></th>
+				</tr>
+				<tr class="center" ng-repeat="cat in $data">
+					<td data-title="'Nro'" sortable="nro tratamiento" style="width:1%">
+						{{cat.iddocumentos}}</td>
+					<td data-title="'Doctor'" sortable="nrotratamiento" style="width:25%">
+						{{cat.doctor.nombres}}</td>
+					<td data-title="'Fecha'" sortable="fecha" style="width: 10%;">
+						{{cat.fecharegistro | date:'dd-MM-yyyy'}}</td>
+					<td data-title="'Total Tratamiento'" sortable="fecha"  style="width: 13%;">
+						{{cat.total}}</td>
+					<td data-title="'Total Abonos'" sortable="abonos" style="width:13%">
+						{{cat.totalpago}}</td>
+					<td data-title="'Saldo Pendiente'" sortable="saldo" style="width:15%">
+						{{cat.totalfin}}</td>
+					<td data-title="'Estado'" sortable="estado" style="width: 2%;">
+					<span style=" font-size: 12px; font-family: arial; font-weight: normal;"
+							class="{{cat.estado==0?'label bg-danger'
+                                    :cat.estado==1?'label label-warning'
+                                    :cat.estado==4?'label label-warning'
+                                    :cat.estado==3?'label label-info'
+                                    :cat.estado==5?'label label-success':''}}">
+                                  {{cat.estado==0?'Anulado'
+									:cat.estado==1?'Solicitado'
+										:cat.estado==3?'Aprobado'
+										:cat.estado==4?'Pagado Parcial'
+										:cat.estado==5?'Pagado':''}}</span>										
+					</td>	
+							<td style="width: 2%;" >
+					<div class="btn-group" dropdown="">
+						<a dropdown-toggle="" aria-haspopup="true" aria-expanded="true" ng_hide="cat.estado==4 || cat.estado==5?true:false">
+							<i class="glyphicon glyphicon-refresh text-success"  ng-click="aprobar(lg,1,cat.iddocumentos)"></i>
+							</i>
+						</a>
+					</div>
+     			</td>
+     			<td style="width: 2%;">
+					<div class="btn-group" dropdown="" ng_hide="cat.estado==4 || cat.estado==5?true:false">
+						<a dropdown-toggle="" aria-haspopup="true" aria-expanded="true">
+							<i class="glyphicon glyphicon-trash text-success" ng-click="crud(2,cat)"></i>
+						</a>
+					</div>
+     			</td>		
+				 
+				</tr>
+			</table>
+		</div>
+		</fieldset>
+		</div>
+		</div>
+		<div class="col-sm-10" style="background:" ng-hide="pago">
+		<div class="container col-sm-10 col-sm-offset-1">
+		<fieldset><legend>Pagos</legend>
+		<div class="form-horizontal form-validation">
+			<div class="form-group">
+			<label class="col-sm-3 control-label">Total Presupuesto:</label>
+			<label class="col-sm-1 control-label" style="padding-right:80px">S/.{{tpre}}</label>
+			<div class="form-group">
+			<label class="col-sm-2 control-label">Total Abonos:</label>
+			<label class="col-sm-1 control-label" style="padding-right:80px">S/.{{tabo}}</label>
+			</div>
+			</div>
+			<div class="form-group">
+			<label class="col-sm-4 control-label">Saldo de presupuesto no pagado:</label>
+			<label class="col-sm-1 control-label" style="padding-right:80px" ng-style="tpaf > 0 ? { 'color': 'red' } : {}">S/.{{tpaf}}</label>
+		
+		</div>		
+	</div>
+		<div class="table">
+			<table ng-table="tableParamsPagos" export-csv="csv"
+				class="table table-bordered">
+				<tr style="background:#D6FFF8">
+					<th colspan="2"><center>Presupuesto</center></th>
+					<th><center>Total Abonado</center></th>
+					<th><center>Saldo Pendiente</center></th>
+					<th><center>Estado</center></th>
+					<th><center>Totales</center></th>
+				</tr>			 
+				<tr class="center" ng-repeat-start="cat in $data"  >
+				<td style="width: 1%;">
+					<button ng-click="cat.expanded = !cat.expanded">+</button>
+				</td>
+				 	<td data-title="'Presupuesto'" sortable="nombres" style="width:20%">
+				 		{{cat.nombretratamiento}}
+					</td>
+					<td data-title="'Total Abonado'" sortable="duracion" style="width:13%">
+						{{cat.totalpago}}
+					</td>
+					<td data-title="'Saldo Pendiente'" sortable="precio" style="width:15%">
+						{{cat.totalfin}}
+					</td>
+					<td data-title="'Estado'" sortable="estado" style="width: 2%;">
+					<span style="width: 50px; font-size: 12px; font-family: arial; font-weight: normal;"
+							class="{{cat.estado==3?'label bg-warning'
+                                    :cat.estado==5?'label label-success':''}}">
+                                  {{cat.estado==3?'Sin Pagos'
+                                  :cat.estado==4?'Pagado Parcial'
+									:cat.estado==5?'Pagado total':''}}</span>										
+					</td>
+					<td data-title="'Totales'" sortable="estado" style="width: 13%;">						
+						{{cat.total}}</td>
+				</tr>  
+				<tr ng-show="cat.expanded" class="mostrar" ng-repeat-end="cat in $data"> 
+								<td colspan="12">
+								<tabset class="	container col-sm-10 col-sm-offset-1">  
+								<tab heading="Detalle"> 
+									<div class="panel-body">
+									<div class="table-responsive">
+										<table st-table="cat.lsServicio" st-pipe="callServer"
+											class="table table-bordered">
+												<tr style="background:#D6FFF8">
+													<th st-sort="cat.nombre">Servicio</th>
+													<th st-sort="cat.tiempoduracion">Subtotal</th>
+													<th st-sort="cat.precio">Descuento</th>
+													<th st-sort="cat.precio">Total</th>
+												</tr>
+												<tr ng-repeat="a in cat.lsdetalle" ng-hide="isLoading">
+													<td>{{a.servicio.descripcion}}</td>
+													<td>{{a.servicio.precio}}</td>
+													<td>{{a.descuentodet==undefined?0:a.descuentodet}}</td>
+													<td>{{a.totdes==undefined?0:a.totdes}}</td>
+												</tr>
+										</table>
+								</div>
+									<div style="float:right">
+											<button type="submit"
+											ng-click="insertapago(lg,1,cat)" class="btn btn-sm btn-success btn-addon"
+											tooltip-placement="right"  ng-hide="cat.estado==5?true:false"
+											tooltip="{{titulopaciente}} nuevo paciente.">
+											<i class="glyphicon glyphicon-floppy-disk"></i>{{paciente.idpaciente==0?'Insertar':'Insertar Pago'}}
+											</button>
+											</div>
+									</div>
+									</tab>
+									<tab
+										heading="Pagos efectuados"> 
+									<div class="panel-body">
+									<div class="table-responsive">
+										<table st-table="cat.lsServicio" st-pipe="callServer"
+											class="table table-striped b-t b-light">
+											<thead>
+												<tr>
+													<th st-sort="cat.nombre">Nº Comprobante</th>
+													<th st-sort="cat.tiempoduracion">Monto</th>
+													<th st-sort="cat.precio">Fecha de pago</th>
+													<th></th>
+												</tr>
+											</thead>
+											<tbody ng-hide="isLoading">
+												<tr ng-repeat="b in cat.lspago">
+													<td>{{b.idpago}}</td>
+													<td>{{b.montocancelado}}</td>
+													<td>{{b.fechapago | date:'dd-MM-yyyy'}}</td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+								</div>
+							</tab>
+						</tabset>
+					</td>
+				</tr>
+			</table>
+		</div>
+		</fieldset>
+		</div>
+		</div>
+		<div class="col-sm-10" style="background:" ng-hide="fichapago">
+		<div class="container col-sm-10 col-sm-offset-1">
+		<fieldset><legend>Ficha de Pagos</legend>
+		<div class="row wrapper">
+		</div>
+		<div class="table">
+			<table ng-table="" export-csv="csv" class="table table-bordered">
+				<tr style="background:#D6FFF8">
+					<th><center>C.D.Tratante</center></th>
+					<th><center>Fecha</center></th>
+					<th><center>Haber S/.</center></th>
+					<th><center>Saldo S/.</center></th>
+					<th><center>Firma del Paciente</center></th>
+				</tr>
+				<tr class="center" ng-repeat="f in lsfichadepagos">
+					<td><center>{{f.idpago}}</center></td>
+					<td><center>{{f.fechapago  | date:'dd-MM-yyyy'}}</center></td>
+					<td><center>{{f.montocancelado}}</center></td>
+					<td><center>{{f.saldo}}</center></td>
+					<td><center> <input ng-model="ficha.firma" ng-change="cambiafirma()" type="checkbox"></center></td>
+				</tr>
+			</table>
+		</div>
+		</fieldset>
+		</div>
+		</div>
+		</div>
+		</form>
+	</tab>
+	<tab> <tab-heading>Evolucion del paciente<span
+		class="badge badge-sm m-l-xs"></span> </tab-heading>
+		<div class="container" style="padding:0 80px">
+		<fieldset><legend>Evolucion de Paciente</legend>
+			<div class="col-sm-3" style="background:">
+				<button class="btn btn-sm btn-primary btn-addon">
+				<i class="glyphicon glyphicon-pencil"></i>Agregar Evolucion</button>
+			</div>
+			<br><br><br>
+		<div class="table">
+			<table ng-table="" export-csv="csv" class="table table-bordered">
+				<tr style="background:#D6FFF8">
+					<th><center>Fecha</center></th>
+					<th><center>Observacion</center></th>
+				</tr>
+				<tr class="center" ng-repeat="cat in $data">
+					<td data-title="'Fecha'" sortable="Fecha" style="width:20%"></td>
+					<td data-title="'Observacion'" sortable="Observacion" style="width:20%"></td>	
+				 
+				</tr>
+			</table>
+		</div>
+		<div class="form-group">
+			<div class="col-sm-8">
+				<label class=" control-label">Alta del paciente :</label>
+				<textarea class="form-control rounded-0" rows="3"></textarea>
+			</div>
+		</div>
+		<div class="form-group">
+		<div class="col-sm-4" style="background:">
+		 <button type="submit" ng-disabled="formValidateDatGen.$invalid"
+				ng-click="" class="btn btn-sm btn-success btn-addon"
+				tooltip-placement="right" style="margin:40px 100px"
+				tooltip="guardar">
+				<i class="glyphicon glyphicon-floppy-disk"></i>Guardar
+			</button>
+		</div>
+		</div>
+		</fieldset>
+		</div>
+		
+	</tab>
+	<tab> <tab-heading>Examenes<span
+		class="badge badge-sm m-l-xs"></span> </tab-heading>
+		<div class="container" style="padding:0 80px">
+			<fieldset>
+				<legend>Examenes Auxiliares</legend>
+					<div class="form-group">
+						<div class="col-sm-2"></div>
+							<div class="col-sm-8">
+									<textarea class="form-control rounded-0" rows="2"></textarea>
+							</div>
+						<div class="col-sm-2"></div>
+						<br><br><br>
+					</div>
+					<div class="form-group">
+							<div class="col-sm-12">
+								<button type="submit" class="btn btn-sm btn-success btn-addon">
+									<i class="glyphicon glyphicon-floppy-disk"></i>Subir Imagen
+								</button>
+							</div>
+							<br><br>
+					</div>
+					
+					<div class="form-group">
+						<div class="col-md-4">
+      						<div class="thumbnail">
+          						<img src="img/diente1.png" style="width:100%">
+          						<div class="caption">
+            						<p>Lorem ipsum donec id elit non mi porta gravida at eget metus.</p>
+          						</div>
+        						</a>
+      						</div>
+    					</div>
+						<div class="col-md-4">
+      						<div class="thumbnail">
+          						<img src="img/diente1.png" style="width:100%">
+          						<div class="caption">
+            						<p>Lorem ipsum donec id elit non mi porta gravida at eget metus.</p>
+          						</div>
+        						</a>
+      						</div>
+    					</div>
+						<div class="col-md-4">
+      						<div class="thumbnail">
+          						<img src="img/diente1.png" style="width:100%">
+          						<div class="caption">
+            						<p>Lorem ipsum donec id elit non mi porta gravida at eget metus.</p>
+          						</div>
+        						</a>
+      						</div>
+    					</div>
+    				</div>
+					
+			</fieldset>
+		</div>
+	</tab>
+</tabset>
+</div>

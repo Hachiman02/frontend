@@ -1,0 +1,139 @@
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<script type="text/ng-template" id="modalMarcaController.html">
+    <div ng-include="'tpl/marca/modalMarca.html'"></div>
+</script>
+<script type="text/ng-template" id="modalnuevoMarca.html">
+    <div ng-include="'tpl/marca/nuevoMarca.html'"></div>
+</script>
+<div cg-busy="{promise:promise,templateUrl:template,message:message,backdrop:backdrop,delay:delay,minDuration:minDuration}">
+	<div class="bg-light lter b-b wrapper-md ng-scope">
+		<h1 class="m-n font-thin h3">VALORE LOS SERVICIOS UNIVERSITARIOS RECIBIDOS</h1>
+
+	</div>
+	<div ui-view class="panel panel-default">
+		<div class="row wrapper">
+			
+			
+				<div style="height: 500px">
+				<div class="modal-body">
+				<table ng-table="" export-csv="csv" class="table table-hover table-striped " style="border: 1px solid #eaeff0">
+					<tr>
+					    <th class="text-center" WIDTH="50" HEIGHT="40"></th>
+						<th class="text-center" WIDTH="50" HEIGHT="40">EXCELENTE</th>
+						<th class="text-center" WIDTH="50" HEIGHT="40">MUY BUENO</th>
+						<th class="text-center" WIDTH="50" HEIGHT="40">BUENO</th>
+						<th class="text-center" WIDTH="50" HEIGHT="40">REGULAR</th>
+						<th class="text-center" WIDTH="50" HEIGHT="40">PESIMO</th>
+						<th class="text-center" WIDTH="50" HEIGHT="40">NO LO UTILIZO</th>
+						<th class="text-center" WIDTH="50" HEIGHT="40">DESCONOCIA QUE SE BRINDABA</th>
+					</tr>
+					<tr class="text-center">
+					    <td align="center">Formacion integral</td>
+						<td><input type="radio" ngmodel="" name="a" value=""></td>
+						<td><input type="radio" name="a" value=""></td>
+						<td><input type="radio" name="a" value=""></td>
+						<td><input type="radio" name="a" value=""></td>
+						<td><input type="radio" name="a" value=""></td>
+						<td><input type="radio" name="a" value=""></td>
+						<td><input type="radio" name="a" value=""></td>
+						
+					</tr>
+					<tr class="text-center">
+					    <td>Calidad Docente</td>
+						<td><input type="radio" name="g" value="male"></td>
+						<td><input type="radio" name="g" value="male"></td>
+						<td><input type="radio" name="g" value="male"></td>
+						<td><input type="radio" name="g" value="male"></td>
+						<td><input type="radio" name="g" value="male"></td>
+						<td><input type="radio" name="g" value="male"></td>
+						<td><input type="radio" name="g" value="male"></td>
+						
+					</tr>
+					<tr class="text-center">
+					    <td>Calidad atencion del asesor de tesis</td>
+						<td><input type="radio" name="ge" value="male"></td>
+						<td><input type="radio" name="ge" value="male"></td>
+						<td><input type="radio" name="ge" value="male"></td>
+						<td><input type="radio" name="ge" value="male"></td>
+						<td><input type="radio" name="ge" value="male"></td>
+						<td><input type="radio" name="ge" value="male"></td>
+						<td><input type="radio" name="ge" value="male"></td>
+						
+					</tr>
+					<tr class="text-center">
+					    <td>Calidad atencion del personal de oficina</td>
+						<td><input type="radio" name="gen" value="male"></td>
+						<td><input type="radio" name="gen" value="male"></td>
+						<td><input type="radio" name="gen" value="male"></td>
+						<td><input type="radio" name="gen" value="male"></td>
+						<td><input type="radio" name="gen" value="male"></td>
+						<td><input type="radio" name="gen" value="male"></td>
+						<td><input type="radio" name="gen" value="male"></td>
+						
+					</tr>
+					<tr class="text-center">
+					    <td>Calidad atencion del director</td>
+						<td><input type="radio" ngmodel=""></td>
+						<td><input type="radio" name="gend" value="male"></td>
+						<td><input type="radio" name="gend" value="male"></td>
+						<td><input type="radio" name="gend" value="male"></td>
+						<td><input type="radio" name="gend" value="male"></td>
+						<td><input type="radio" name="gend" value="male"></td>
+						<td><input type="radio" name="gend" value="male"></td>	
+					</tr>
+					<tr class="text-center">
+					    <td>Servicio del tramite administrativo</td>
+						<td><input type="radio" name="gend" value="male"></td>
+						<td><input type="radio" name="gend" value="male"></td>
+						<td><input type="radio" name="gend" value="male"></td>
+						<td><input type="radio" name="gend" value="male"></td>
+						<td><input type="radio" name="gend" value="male"></td>
+						<td><input type="radio" name="gend" value="male"></td>
+						<td><input type="radio" name="gend" value="male"></td>	
+					</tr>
+					<tr class="text-center">
+					    <td>Bibliotecas</td>
+						<td><input type="radio" name="gend1" value="male"></td>
+						<td><input type="radio" name="gend1" value="male"></td>
+						<td><input type="radio" name="gend1" value="male"></td>
+						<td><input type="radio" name="gend1" value="male"></td>
+						<td><input type="radio" name="gend1" value="male"></td>
+						<td><input type="radio" name="gend1" value="male"></td>
+						<td><input type="radio" name="gend1" value="male"></td>	
+					</tr>
+					<tr class="text-center">
+					    <td>Base de datos indexadas</td>
+						<td><input type="radio" name="gend1" value="male"></td>
+						<td><input type="radio" name="gend1" value="male"></td>
+						<td><input type="radio" name="gend1" value="male"></td>
+						<td><input type="radio" name="gend1" value="male"></td>
+						<td><input type="radio" name="gend1" value="male"></td>
+						<td><input type="radio" name="gend1" value="male"></td>
+						<td><input type="radio" name="gend1" value="male"></td>	
+					</tr>
+					<tr class="text-center">
+					    <td>Apoyo para la difusion de resultados de investigacion</td>
+						<td><input type="radio" name="gend1" value="male"></td>
+						<td><input type="radio" name="gend1" value="male"></td>
+						<td><input type="radio" name="gend1" value="male"></td>
+						<td><input type="radio" name="gend1" value="male"></td>
+						<td><input type="radio" name="gend1" value="male"></td>
+						<td><input type="radio" name="gend1" value="male"></td>
+						<td><input type="radio" name="gend1" value="male"></td>	
+					</tr>
+					<tr class="text-center">
+					    <td>Laboratorio</td>
+						<td><input type="radio" name="gend" value="male"></td>
+						<td><input type="radio" name="gend" value="male"></td>
+						<td><input type="radio" name="gend" value="male"></td>
+						<td><input type="radio" name="gend" value="male"></td>
+						<td><input type="radio" name="gend" value="male"></td>
+						<td><input type="radio" name="gend" value="male"></td>
+						<td><input type="radio" name="gend" value="male"></td>	
+					</tr>
+				</table>
+				
+               </div>
+			</div>
+		</div>
+	</div>

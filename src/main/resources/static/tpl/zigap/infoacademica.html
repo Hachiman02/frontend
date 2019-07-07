@@ -1,0 +1,65 @@
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<script type="text/ng-template" id="modalMarcaController.html">
+    <div ng-include="'tpl/marca/modalMarca.html'"></div>
+</script>
+<script type="text/ng-template" id="modalnuevoMarca.html">
+    <div ng-include="'tpl/marca/nuevoMarca.html'"></div>
+</script>
+<div
+	cg-busy="{promise:promise,templateUrl:template,message:message,backdrop:backdrop,delay:delay,minDuration:minDuration}">
+	<div class="bg-light lter b-b wrapper-md ng-scope">
+		<h1 class="m-n font-thin h3">Informacion Academiza</h1>
+
+	</div>
+	<div ui-view class="panel panel-default">
+		<div class="row wrapper">
+			 
+			 <!--The content below is only a placeholder and can be replaced.-->
+    <h2 class="col-sm-10" style="left:25px">EJERCICIO PROFESIONAL O DOCENTE</h2>
+    <p class="col-sm-10" style="left:25px">Consigne el desempeño profesional o desempeño docente: Entidad en la que labora, Cargo que desempeña, Tiempo(años,meses) del servicio.[El mas reciente]</p>
+   
+	<section class="contact-page-area section-gap">
+  
+    <div class="col-lg-12" style="left:25px"> 			
+      <div class="row">	
+        
+        <div class="col-lg-10 form-group">
+          <h4>CÓDIGO DE ESTUDIANTE</h4>
+            <input name="subject" placeholder="Ingresa tu código" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Ingresa tu código'"  class="common-input mb-20 form-control" required="" type="text" ><br>
+          <h4>PROGRAMA CURSADO</h4>
+            <input type="radio" name="Programa-Cursado" value="DISI"> Doctorado en Ingeniería de Sistemas e Informática <br>
+            <input type="radio" name="Programa-Cursado" value="GTIC"> Maestría en Ingeniería de Sistemas e Informática con mención en Gestión de Tecnologías de Información y Comunicaciones><br>
+            <input type="radio" name="Programa-Cursado" value="DTIC"> Maestría en Ingeniería de Sistemas e Informática con mención en Dirección en Gestión de Tecnologías de Información<br>
+            <input type="radio" name="Programa-Cursado" value="ISW"> Maestría en Ingeniería de Sistemas e Informática con mención en Ingeniería de Software<br>
+            <input type="radio" name="Programa-Cursado" value="GIC"> Maestría en Gestión de la Información y del Conocimiento<br>
+            <input type="radio" name="Programa-Cursado" value="GTI"> Maestría en Gobierno de Tecnologías de Información<br>
+            <input type="radio" name="Programa-Cursado" value="GPTI"> Diplomatura en Gerencia de Proyectos de Tecnologías de Información<br>
+            <input type="radio" name="Programa-Cursado" value="ASTI"> Diplomatura en Especialización en Auditoría y Seguridad de Tecnologías de Información<br>
+            <input type="radio" name="Programa-Cursado" value="GPGE"> Diplomatura en Gestión Pública y Gobierno Electrónico<br>
+            <input type="radio" name="Programa-Cursado" value="OTRO"> Otro: 
+            <input name="subject" placeholder="Ingresa algún otro programa diferente de la lista" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Ingresa tu situación académica actual'" class="common-input mb-20 form-control" required="" type="text" 	align="right"><br>
+          <h4>SEMESTRE ACADÉMICO QUE INGRESÓ [Ejm. 2016-1]</h4>
+							<input name="subject" placeholder="Ingresa el semestre académico en que ingresó" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Ingresa el semestre académico en que ingresó'" class="common-input mb-20 form-control" required="" type="text"><br>
+					<h4>SEMESTRE ACADÉMICO QUE EGRESÓ [Ejm. 2016-1]</h4>
+							<input name="subject" placeholder="Ingresa el semestre académico en que egresó" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Ingresa el semestre académico en que egresó'" class="common-input mb-20 form-control" required="" type="text"><br>
+					<h4>SITUACIÓN ACADÉMICA ACTUAL</h4>
+              <input name="subject" placeholder="Ingresa tu situación académica actual" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Ingresa tu situación académica actual'" class="common-input mb-20 form-control" required="" type="text"><br>						
+        </div>
+      </div>
+
+    </div>
+      <div class="col-lg-12">
+          <div class="row">	
+              <div class="col-lg-5 form-group">
+              </div>
+              <div class="col-lg-6 form-group">
+                  <button class="primary-btn mt-20 text-black">GUARDAR</button>   
+              </div>
+          </div>
+      </div>
+
+  </section>
+  		 
+			</div>
+		</div>
+	</div>

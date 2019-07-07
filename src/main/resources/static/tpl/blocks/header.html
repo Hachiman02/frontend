@@ -1,0 +1,99 @@
+ 
+<!-- navbar header -->
+<div class="navbar-header bg-white-only">
+	<button class="pull-right visible-xs dk" ui-toggle-class="show"
+		data-target=".navbar-collapse">
+		<i class="glyphicon glyphicon-cog"></i>
+	</button>
+	<button class="pull-right visible-xs" ui-toggle-class="off-screen"
+		data-target=".app-aside" ui-scroll-to="app">
+		<i class="glyphicon glyphicon-align-justify"></i>
+	</button>
+	<!-- brand -->
+	<!-- / brand -->
+</div>
+<!-- / navbar header -->
+
+<!-- navbar collapse -->
+<div
+	class="collapse pos-rlt navbar-collapse box-shadow {{app.settings.navbarCollapseColor}}" style="margin: 0">
+	<!-- buttons -->
+	<a   class="nav navbar-nav hidden-xs" style="margin: 4px;width: 169px;padding: 4px;"> <img
+		src="img/logo_unmsm.png" alt="." style="max-height: 35px">
+	</a>
+	<div class="nav navbar-nav hidden-xs">
+		<a href class="btn no-shadow navbar-btn" style="margin: 13px 0 12px 10px;padding: 0"
+			ng-click="app.settings.asideFolded = !app.settings.asideFolded">
+			<i class="fa {{app.settings.asideFolded ? 'fa-indent' : 'fa-dedent'}} fa-fw text-white-dker iconhover" style="font-size: 23px"></i>
+		</a>
+	</div>
+	
+	<!-- / buttons -->
+
+	<!-- link and dropdown -->
+
+	<!-- / link and dropdown -->
+
+	<!-- search form -->
+	<!-- <form class="navbar-form navbar-form-sm navbar-left shift"
+		ui-shift="prependTo" target=".navbar-collapse" role="search"
+		ng-init="retornaLocales()">
+		<div class="form-group">
+			
+			<div class="input-group">
+				<input type="text" ng-model="selected"
+					typeahead="state for state in states | filter:$viewValue | limitTo:8"
+					class="form-control input-sm bg-select  no-border rounded padder"
+					placeholder="buscar pacientes..."> <span
+					class="input-group-btn">
+					<button type="submit" class="btn btn-sm bg-select  rounded">
+						<i class="fa fa-search "></i>
+					</button>
+				</span>
+			</div>
+		</div>
+	</form> -->
+	<form class="navbar-form navbar-form-sm navbar-right shift"
+		ui-shift="prependTo" target=".navbar-collapse" role="search"
+		>
+	</form>
+	<div ng-controller="asideController">
+		 
+		<div class="col-sm-3" style="display: flex;padding-top:10px; margin-left: 200px">
+        <h6 class="title" >Programa:</h6>&nbsp;&nbsp;&nbsp;
+        	   
+		 <select name="repeatSelect" id="repeatSelect" ng-model="users.idprograma">
+      <option ng-repeat="value in lsPrograma" value="{{value.idprograma}}">{{value.nom_programa}}</option>
+    </select>
+		</div>
+		
+		 
+	</div>
+	<!-- / search form -->
+
+	<!-- nabar right -->
+	<ul class="nav navbar-nav navbar-right">
+		<!--  <li>
+			<img src="img/diente2.png" class="icon-user fa-fw text-white-dker" style="margin:6px 0px; padding: 7px 0px">
+		</li> -->
+		 <div class="contenedor-logo4 col-md-2">
+            	<div class="content-icon">
+            		<img src="img/logo_unmsm.png" class="icon-logo" style="max-height: 52px;width: 70px" alt="" href="#"/>
+            	</div>
+            </div>
+		
+		
+		
+	</ul>
+	<!--  <ul class="nav navbar-nav navbar-right">
+
+		<li class="hidden-xs"><a ui-fullscreen class="text-white-dker"></a></li>
+
+
+
+	</ul>-->
+	<!-- / navbar right -->
+
+</div>
+<!-- / navbar collapse -->
+ 

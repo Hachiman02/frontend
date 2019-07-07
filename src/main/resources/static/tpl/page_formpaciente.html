@@ -1,0 +1,72 @@
+<meta charset="utf-8" />
+<meta name="viewport" content="width-device-width, user-scalable=no, initial-scale-1, maximum-scale=1, minimum-scale=1 "/>
+<form ng-controller="formPacienteController" class="col-sm-12" style="padding:0 300px;overflow-y:auto;height:573px">
+<script type="text/ng-template" id="myModalContentConfirma.html">
+    <div ng-include="'tpl/confirm/modal.html'"></div>
+</script>
+<script type="text/ng-template" id="Modalformpaciente.html">
+    <div ng-include="'tpl/page_Modalformpaciente.html'"></div>
+</script>
+		<div class="form-group" ng-hide=end>
+           <div class="col-sm-12" style="background:">
+              	<div class="alert alert-info" style="font-size:15px">
+                	<i class="glyphicon glyphicon-info-sign"></i>&nbsp&nbsp
+                    	Para reservar su cita siga los siguientes pasos:<br>
+                        1.Seleccione un doctor<br>
+                        2.Elija el horario y fecha para su reserva dandole click en el calendario 
+             	</div>
+        	</div> 
+        </div>
+        <div class="form-group" ng-show=end>
+           <div class="col-sm-12" style="background:">
+              	<div class="alert alert-info" style="font-size:15px">
+                	<i class="glyphicon glyphicon-info-sign"></i>&nbsp&nbsp
+                    	Su cita fue reservada con exito.
+             	</div>
+        	</div> 
+        </div>
+		<div class="form-group">
+			<label class="col-sm-1 control-label" style="font-size:15px"><strong>Doctor:</strong></label>
+				<div class="col-sm-3">
+					<select class="form-control" ng-model="cit.iddoctor" ng-change="retornaData()" ng-disabled="end"					   
+						ng-options="value.iddoctor as value.nombres for value in doctores">
+							<option>--</option>
+					</select>
+				</div>
+			<div class="col-sm-8">
+				<div class="pull-right">
+					<div class="btn-group m-l-xs">
+						<button class="btn btn-sm btn-default"
+							ng-click="changeView('agendaDay')">Hoy</button>
+						<button class="btn btn-sm btn-default"
+							ng-click="changeView('agendaWeek')">Semana</button>
+						<button class="btn btn-sm btn-default"
+							ng-click="changeView('month')">Mes</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="hbox hbox-auto-xs hbox-auto-sm" ng-init="retornaData()" style="">
+			<div class="col-sm-12" >
+				<div class="col wrapper-md">
+					<div class="clearfix m-b" style="background:">
+						<div class="pos-rlt col bg-light dk" style="color:black;box-shadow: 0px 0px 3px 4px rgba(0,151,167,0.4);">
+			 				<div class="fc-overlay">
+							</div>
+								<div class="calendar" ng-model="eventSources" calendar="myCalendar"
+									config="uiConfig.calendar" ui-calendar="uiConfig.calendar"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="btn-group col-sm-12" style="padding:0 150px; "  ng-hide=!end>
+				
+						<button class="btn btn-sm btn-default"  style="padding:10px 200px;font-size:15px;border-radius:20px;box-shadow: 0px 0px 3px 4px rgba(0,0,0,0.3);"
+							ng-click="Finish()"><strong>Salir</strong></button>
+					
+			</div>
+		</div>
+		
+</form>
+
