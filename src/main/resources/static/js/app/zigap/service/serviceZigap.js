@@ -21,6 +21,37 @@ app.factory("zigapServices", ['$modal','$http','toaster','$q','services', functi
   };
   
   
+  obj.actualizaAlumno = function (alumno,lsalum) {   debugger
+	  console.log("alumno 1", alumno);
+  		var alum={};
+  		alum.ape_materno=alumno.ape_materno;
+  		alum.ape_paterno=alumno.ape_paterno;
+  		alum.cod_alumno=alumno.cod_alumno;
+  		alum.id_alum=alumno.id_alum;
+  		alum.dni_m=alumno.dni;
+  		alum.telefono_movil=alumno.telefono_movil;
+  		alum.telefono=alumno.telefono;
+  		alum.domicilio_actual=alumno.domicilio_actual;
+  		alum.correo_personal=alumno.correo_personal;
+  		alum.correo=alumno.correo;
+  		alum.nac_fecha=alumno.nac_fecha;
+  		alum.lsalum=lsalum;
+
+  	  console.log("alumno 2", alum);
+
+  		 
+  
+  
+      return $http.post(services+'zigap/actualizaAlumno',alum)
+      .success(function (results) {   
+          console.log("actualiza alumno ",results);
+       
+          return results;
+      }).error(function (results) {
+          toaster.pop("error", "", "Error durante la transacciÃ³n:"+results+", codigo:0", 10000, 'trustedHtml');
+          return results;
+      });
+  };
 
   obj.listarProgramas = function ( id_alum) {   
 	  debugger

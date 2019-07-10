@@ -2,15 +2,37 @@ app.controller('zigapController',['$scope', '$http','$rootScope','ngTableParams'
 	'$filter','ngTableParams','zigapServices','$q','$modal','toaster', function($scope, $http, $rootScope,ngTableParams,
 		$cookieStore, $location, $filter, ngTableParams, zigapServices, $q,
 		$modal, toaster) {
-	 
+	 debugger
 	$scope.obj={};
 	$scope.lsAlumno_programa={};
 	$scope.programa={};
-	$scope.lsproducto = [];
+	$scope.lsproducto = [];  
 	$scope.producto={};
 	$scope.lsempresa=[{"razon_social":"nissan"},{"razon_social":"nike"},{"razon_social":"samsung"}];
     $rootScope.users = $cookieStore.get('users') || {};
+    $rootScope.lsusers = $cookieStore.get('lsusers') || {};
+
+    
     $scope.user= $rootScope.users;
+    
+    
+    $scope.actualizaAlumno=function(){  debugger
+  	  console.log("alumno 2", $scope.user);
+
+    	zigapServices.actualizaAlumno($scope.user,$rootScope.lsusers).then(function(result) {
+           debugger 
+    		
+    		toaster.pop("success", "", result.data.msg, 10000, 'trustedHtml');
+
+     		 
+    		}, function(result) {
+    			// something went wrong
+    			return $q.reject(result.data);
+    		});;
+    	
+    	
+    	}
+    
 	/*$scope.validarCorreo=function(){  
 	zigapServices.validarCorreo($scope.lsAlumno_programa).then(function(result) {
 			   

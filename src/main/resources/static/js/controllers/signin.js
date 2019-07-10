@@ -150,16 +150,21 @@ app.controller('SigninFormController', ['services','store', '$modal', '$location
     	$scope.alumno;
     	$scope.retornaAlumno($scope.alumno).then(function(result) {   
     		if (result.data.estado == 1) {    debugger
+    			 
+     			
   		 	     $rootScope.users=result.data.aaData[0];
+  		 	     $rootScope.lsusers=result.data.aaData;
   		 	     $rootScope.lsprograma_user=result.data.lsprograma;
 
           	        $cookieStore.put('users', $rootScope.users); 
+          	      $cookieStore.put('lsusers', $rootScope.lsusers); 
           	        $cookieStore.put('lsprograma_user', $rootScope.lsprograma_user);  
 
          	    	$state.go('app.ui.inicio'); 
-       			
+     
             } else { //  
-         	       
+    			toaster.pop("error","","El usuario no esta registrado ", 10000, 'trustedHtml');	
+
      	  $state.go('access.signin');
       
             } 

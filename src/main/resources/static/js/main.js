@@ -157,9 +157,9 @@ angular.module('app')
   }])
  //.constant('API_BASE', 'http://192.168.2.127:8081')
 //.constant('services', 'http://192.168.2.127:8081/'+'api/')
-//.constant('services','http://localhost:80/'+'pub/')
-.constant('API_BASE', 'http://localhost:8081')
- 	.constant('services','https://backencuesta223.herokuapp.com/'+'pub/');
+//.constant('services','http://localhost:8081/'+'pub/')
+ 	.constant('services','https://backencuesta223.herokuapp.com/'+'pub/')
+.constant('API_BASE', 'http://localhost:8081');
 
 app.filter('setDecimal', ['$filter', function($filter) {
     return function(input, places) {
