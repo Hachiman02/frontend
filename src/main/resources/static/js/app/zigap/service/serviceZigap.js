@@ -21,6 +21,32 @@ app.factory("zigapServices", ['$modal','$http','toaster','$q','services', functi
   };
   
   
+  
+  
+  obj.registraInformacionAcademica = function (informacion) {   debugger
+	  console.log("informacion 1", informacion);
+  		var info={};
+  		info.cod_alumno=informacion.cod_alumno;
+  		info.id_programa=informacion.id_programa;
+  		info.programa_otro=informacion.programa_otro;
+  		info.semestre_ingreso=informacion.semestre_ingreso;
+  		info.semestre_egreso=informacion.semestre_egreso;
+  		info.situacion_academica_actual=informacion.situacion_academica_actual;
+  	  
+  		 
+  
+  
+      return $http.post(services+'zigap/registraInformacionAcademica',info)
+      .success(function (results) {   
+          console.log("actualiza info academica ",results);
+       
+          return results;
+      }).error(function (results) {
+          toaster.pop("error", "", "Error durante la transacciÃ³n:"+results+", codigo:0", 10000, 'trustedHtml');
+          return results;
+      });
+  };
+  
   obj.actualizaAlumno = function (alumno,lsalum) {   debugger
 	  console.log("alumno 1", alumno);
   		var alum={};

@@ -1,7 +1,7 @@
 app.controller('zigapController',['$scope', '$http','$rootScope','ngTableParams','$cookieStore','$location',
-	'$filter','ngTableParams','zigapServices','$q','$modal','toaster', function($scope, $http, $rootScope,ngTableParams,
+	'$filter','ngTableParams','zigapServices','$q','$modal','toaster','services', function($scope, $http, $rootScope,ngTableParams,
 		$cookieStore, $location, $filter, ngTableParams, zigapServices, $q,
-		$modal, toaster) {
+		$modal, toaster,services) {
 	 debugger
 	$scope.obj={};
 	$scope.lsAlumno_programa={};
@@ -11,8 +11,10 @@ app.controller('zigapController',['$scope', '$http','$rootScope','ngTableParams'
 	$scope.lsempresa=[{"razon_social":"nissan"},{"razon_social":"nike"},{"razon_social":"samsung"}];
     $rootScope.users = $cookieStore.get('users') || {};
     $rootScope.lsusers = $cookieStore.get('lsusers') || {};
-
+    $scope.info_academica={};
     
+    $scope.info_academica.cod_alumno=$rootScope.users.cod_alumno;
+     
     $scope.user= $rootScope.users;
     
     
@@ -23,7 +25,7 @@ app.controller('zigapController',['$scope', '$http','$rootScope','ngTableParams'
            debugger 
     		
     		toaster.pop("success", "", result.data.msg, 10000, 'trustedHtml');
-
+           $scope.refrescaAlumno();
      		 
     		}, function(result) {
     			// something went wrong
@@ -32,6 +34,65 @@ app.controller('zigapController',['$scope', '$http','$rootScope','ngTableParams'
     	
     	
     	}
+    
+    $scope.retornaAlumno = function (alumno) {   
+	     debugger
+   return $http.post(services+'zigap/loginAlumno',alumno)
+   .success(function (results) {      
+     
+       return results;
+   }).error(function (results) {
+       toaster.pop("error", "", "Error durante la transacciÃ³n:"+results+", codigo:0", 10000, 'trustedHtml');
+       return results;
+   });
+};
+
+
+$scope.refrescaAlumno=function(){
+	   
+	 
+	$scope.retornaAlumno($scope.user).then(function(result) {   
+		if (result.data.estado == 1) {    debugger
+			 
+			
+		 	     $rootScope.users=result.data.aaData[0];
+		 	     $rootScope.lsusers=result.data.aaData;
+		 	     $rootScope.lsprograma_user=result.data.lsprograma;
+		 	    $scope.user= $rootScope.users;
+     	        $cookieStore.put('users', $rootScope.users); 
+     	        $cookieStore.put('lsusers', $rootScope.lsusers); 
+     	        $cookieStore.put('lsprograma_user', $rootScope.lsprograma_user);  
+
+    	    	 
+
+       } 
+		
+	})
+	 
+      
+
+}
+
+    
+    $scope.registraInformacionAcademica=function(){  debugger
+    	  console.log("info_academica 2", $scope.info_academica);
+	 if($scope.info_academica.registrado_exito==1){ 
+	 }
+	 else{ 
+      	zigapServices.registraInformacionAcademica($scope.info_academica).then(function(result) {
+             debugger 
+      		$scope.info_academica.registrado_exito=result.data.estado;
+      		toaster.pop("success", "", result.data.msg, 10000, 'trustedHtml');
+
+       		 
+      		}, function(result) {
+      			// something went wrong
+      			return $q.reject(result.data);
+      		});;
+    }
+ 
+      	}
+    
     
 	/*$scope.validarCorreo=function(){  
 	zigapServices.validarCorreo($scope.lsAlumno_programa).then(function(result) {
